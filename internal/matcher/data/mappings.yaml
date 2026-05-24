@@ -1,0 +1,73 @@
+# mr-ducksafe curated mapping — Windows kurulu yazılım adından CVE identifier'ına.
+# Format: bkz. internal/matcher/mapping.go
+mappings:
+  - registry_name: "Google Chrome"
+    publisher: "Google LLC"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:google:chrome"
+    ecosystem_hint: "Chrome"
+    version_normalize: "fourpart"
+
+  - registry_name_pattern: "^Mozilla Firefox.*"
+    publisher: "Mozilla"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:mozilla:firefox"
+    version_normalize: "semver"
+
+  - registry_name: "Microsoft Edge"
+    publisher: "Microsoft Corporation"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:microsoft:edge_chromium"
+    version_normalize: "fourpart"
+
+  - registry_name: "VLC media player"
+    publisher: "VideoLAN"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:videolan:vlc_media_player"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^7-Zip.*"
+    publisher: "Igor Pavlov"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:7-zip:7-zip"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Notepad\\+\\+.*"
+    publisher: "Notepad++ Team"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:notepad-plus-plus:notepad-plus-plus"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Adobe Acrobat Reader.*"
+    publisher: "Adobe"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:adobe:acrobat_reader_dc"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Python 3\\..*"
+    publisher: "Python Software Foundation"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:python:python"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Node\\.js.*"
+    publisher: "Node.js Foundation"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:nodejs:node.js"
+    version_normalize: "semver"
+
+  - registry_name: "Git"
+    publisher: "The Git Development Community"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:git-scm:git"
+    version_normalize: "semver"
