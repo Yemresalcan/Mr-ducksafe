@@ -71,3 +71,283 @@ mappings:
       type: cpe
       value: "cpe:2.3:a:git-scm:git"
     version_normalize: "semver"
+
+  - registry_name_pattern: "^Microsoft Office.*"
+    publisher: "Microsoft Corporation"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:microsoft:office"
+    version_normalize: "fourpart"
+
+  - registry_name_pattern: "^Java(\\(TM\\))? \\d+ Update.*"
+    publisher: "Oracle"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:oracle:jre"
+    version_normalize: "fourpart"
+
+  - registry_name_pattern: "^Java SE Development Kit.*"
+    publisher: "Oracle"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:oracle:jdk"
+    version_normalize: "fourpart"
+
+  - registry_name_pattern: "^OBS Studio.*"
+    publisher: "OBS Project"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:obsproject:obs_studio"
+    version_normalize: "semver"
+
+  - registry_name: "Discord"
+    publisher: "Discord Inc."
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:discord:discord"
+    version_normalize: "semver"
+
+  - registry_name: "Slack"
+    publisher: "Slack Technologies, Inc."
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:slack:slack"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Zoom.*"
+    publisher: "Zoom Video Communications, Inc."
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:zoom:meetings"
+    version_normalize: "fourpart"
+
+  - registry_name_pattern: "^WinRAR.*"
+    publisher: "win.rar GmbH"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:rarlab:winrar"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^PuTTY.*"
+    publisher: "Simon Tatham"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:putty:putty"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^FileZilla Client.*"
+    publisher: "Tim Kosse"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:filezilla-project:filezilla_client"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Microsoft Visual Studio Code.*"
+    publisher: "Microsoft Corporation"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:microsoft:visual_studio_code"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^IntelliJ IDEA.*"
+    publisher: "JetBrains s.r.o."
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:jetbrains:intellij_idea"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^PyCharm.*"
+    publisher: "JetBrains s.r.o."
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:jetbrains:pycharm"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^GoLand.*"
+    publisher: "JetBrains s.r.o."
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:jetbrains:goland"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^WebStorm.*"
+    publisher: "JetBrains s.r.o."
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:jetbrains:webstorm"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Docker Desktop.*"
+    publisher: "Docker Inc."
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:docker:desktop"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^TeamViewer.*"
+    publisher: "TeamViewer"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:teamviewer:teamviewer"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^AnyDesk.*"
+    publisher: "AnyDesk Software GmbH"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:anydesk:anydesk"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Spotify.*"
+    publisher: "Spotify AB"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:spotify:spotify"
+    version_normalize: "fourpart"
+
+  - registry_name_pattern: "^Steam.*"
+    publisher: "Valve Corporation"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:valvesoftware:steam"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Microsoft Teams.*"
+    publisher: "Microsoft Corporation"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:microsoft:teams"
+    version_normalize: "fourpart"
+
+  - registry_name_pattern: "^Microsoft OneDrive.*"
+    publisher: "Microsoft Corporation"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:microsoft:onedrive"
+    version_normalize: "fourpart"
+
+  - registry_name_pattern: "^Adobe Photoshop.*"
+    publisher: "Adobe"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:adobe:photoshop"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Adobe Illustrator.*"
+    publisher: "Adobe"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:adobe:illustrator"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Adobe Premiere Pro.*"
+    publisher: "Adobe"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:adobe:premiere_pro"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^GIMP.*"
+    publisher: "The GIMP team"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:gimp:gimp"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Inkscape.*"
+    publisher: "Inkscape Project"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:inkscape:inkscape"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Blender.*"
+    publisher: "Blender Foundation"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:blender:blender"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Audacity.*"
+    publisher: "Audacity Team"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:audacityteam:audacity"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^LibreOffice.*"
+    publisher: "The Document Foundation"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:libreoffice:libreoffice"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Thunderbird.*"
+    publisher: "Mozilla"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:mozilla:thunderbird"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Opera.*"
+    publisher: "Opera Software"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:opera:opera_browser"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Brave.*"
+    publisher: "Brave Software"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:brave:browser"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Vivaldi.*"
+    publisher: "Vivaldi Technologies"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:vivaldi:vivaldi"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^WinSCP.*"
+    publisher: "Martin Prikryl"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:winscp:winscp"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Wireshark.*"
+    publisher: "The Wireshark developer community"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:wireshark:wireshark"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^OpenSSL.*"
+    publisher: "OpenSSL"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:openssl:openssl"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^OpenVPN.*"
+    publisher: "OpenVPN Inc."
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:openvpn:openvpn"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^Postman.*"
+    publisher: "Postman"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:postman:postman"
+    version_normalize: "semver"
+
+  - registry_name_pattern: "^MySQL Workbench.*"
+    publisher: "Oracle Corporation"
+    identifier:
+      type: cpe
+      value: "cpe:2.3:a:mysql:workbench"
+    version_normalize: "semver"

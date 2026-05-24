@@ -13,8 +13,8 @@ func TestNewDefaultMatcher_Loads(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewDefaultMatcher: %v", err)
 	}
-	if len(m.entries) < 10 {
-		t.Errorf("en az 10 mapping bekleniyor, alındı: %d", len(m.entries))
+	if len(m.entries) < 50 {
+		t.Errorf("en az 50 mapping bekleniyor, alındı: %d", len(m.entries))
 	}
 }
 
