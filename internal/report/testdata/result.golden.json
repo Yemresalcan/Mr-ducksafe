@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "1",
+  "scanId": 42,
+  "startedAt": "2026-05-24T10:00:00Z",
+  "finishedAt": "2026-05-24T10:00:30Z",
+  "appsTotal": 2,
+  "countsBySeverity": {
+    "high": 1
+  },
+  "findings": [
+    {
+      "appName": "Firefox",
+      "appVersion": "100.0",
+      "cveId": "CVE-2022-26485",
+      "severity": "high",
+      "fixedVersion": "97.0.2",
+      "summary": "Use-after-free in XSLT parameter processing",
+      "references": [
+        "https://example.com/advisory"
+      ]
+    }
+  ],
+  "unmatched": [
+    {
+      "name": "Some Random Tool",
+      "version": "1.0",
+      "publisher": "Nobody"
+    }
+  ]
+}
