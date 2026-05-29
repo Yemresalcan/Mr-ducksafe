@@ -3,7 +3,9 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
+	"sync"
 
 	"github.com/spf13/cobra"
 	"github.com/yemresalcan/mr-ducksafe/internal/config"
@@ -13,6 +15,7 @@ import (
 	"github.com/yemresalcan/mr-ducksafe/internal/scanengine"
 	"github.com/yemresalcan/mr-ducksafe/internal/scanner"
 	"github.com/yemresalcan/mr-ducksafe/internal/store"
+	"github.com/yemresalcan/mr-ducksafe/internal/tui"
 	"github.com/yemresalcan/mr-ducksafe/internal/vuln"
 )
 
@@ -63,19 +66,25 @@ func runScan(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
+	stderr := cmd.ErrOrStderr()
+	tty := tui.IsTTY(os.Stderr)
+	if tty {
+		fmt.Fprint(stderr, tui.Banner(Version))
+	}
+
 	nvdClient := nvd.NewClient()
 	if !nvdClient.HasAPIKey() {
-		fmt.Fprintln(cmd.ErrOrStderr(),
+		fmt.Fprintln(stderr,
 			"ipucu: NVD_API_KEY ortam değişkeni ayarlanmamış — tarama yavaş olabilir (5 istek/30sn).")
-		fmt.Fprintln(cmd.ErrOrStderr(),
+		fmt.Fprintln(stderr,
 			"       Ücretsiz key: https://nvd.nist.gov/developers/request-an-api-key")
 	}
 	vulnClient := vuln.NewCachedClient(nvdClient)
 
 	eng := scanengine.New(sc, m, vulnClient, st)
-	result, err := eng.Run(ctx, nil)
+	result, err := runWithProgress(ctx, eng, stderr, tty)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "scan failed:", err)
+		fmt.Fprintln(stderr, "scan failed:", err)
 		os.Exit(2)
 	}
 
@@ -89,6 +98,47 @@ func runScan(cmd *cobra.Command, _ []string) error {
 		os.Exit(1)
 	}
 	return nil
+}
+
+// runWithProgress engine.Run'ı bir progress channel ile çalıştırır ve
+// aşama olaylarını canlı spinner'a çevirir.
+func runWithProgress(ctx context.Context, eng *scanengine.Engine, w io.Writer, tty bool) (*scanengine.ScanResult, error) {
+	prog := tui.NewProgress(w, tty)
+	prog.Update("Kurulu yazılımlar taranıyor...")
+	prog.Start()
+
+	ch := make(chan scanengine.Progress, 16)
+	var (
+		result *scanengine.ScanResult
+		runErr error
+		wg     sync.WaitGroup
+	)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		result, runErr = eng.Run(ctx, ch)
+		close(ch)
+	}()
+
+	for p := range ch {
+		switch p.Stage {
+		case scanengine.StageScan:
+			prog.Complete(fmt.Sprintf("Tarama tamamlandı — %d program", p.Total))
+			prog.Update("Eşleştiriliyor...")
+		case scanengine.StageMatch:
+			prog.Complete(fmt.Sprintf("Eşleştirme tamamlandı — %d eşleşme", p.Done))
+			prog.Update("NVD sorgusu başlıyor...")
+		case scanengine.StageQuery:
+			prog.Update(fmt.Sprintf("NVD sorgusu... %d/%d", p.Done, p.Total))
+		}
+	}
+	wg.Wait()
+
+	if runErr == nil && result != nil {
+		prog.Complete(fmt.Sprintf("Tamamlandı — %d bulgu", len(result.Findings)))
+	}
+	prog.Stop()
+	return result, runErr
 }
 
 func shouldFail(r *scanengine.ScanResult, threshold string) bool {
