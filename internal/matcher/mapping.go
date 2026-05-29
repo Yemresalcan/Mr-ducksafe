@@ -22,6 +22,8 @@ type mappingEntry struct {
 	EcosystemHint    string `yaml:"ecosystem_hint"`
 	VersionNormalize string `yaml:"version_normalize"`
 	VersionFromName  string `yaml:"version_from_name"` // isimden versiyon çıkaran regex (1 capture group)
+	WingetID         string `yaml:"winget_id"`         // remediation: winget paket id
+	UpdateURL        string `yaml:"update_url"`        // remediation: manuel güncelleme linki
 
 	pattern     *regexp.Regexp // registry_name_pattern compiled cache
 	versionFrom *regexp.Regexp // version_from_name compiled cache
@@ -76,6 +78,8 @@ func (m *MappingMatcher) Match(_ context.Context, app scanner.InstalledApp) (Ide
 				Value:     e.Identifier.Value,
 				Ecosystem: e.EcosystemHint,
 				Version:   e.resolveVersion(app),
+				WingetID:  e.WingetID,
+				UpdateURL: e.UpdateURL,
 			}, ConfidenceHigh, nil
 		}
 	}

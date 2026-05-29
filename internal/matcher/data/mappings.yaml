@@ -8,6 +8,8 @@ mappings:
       value: "cpe:2.3:a:google:chrome"
     ecosystem_hint: "Chrome"
     version_normalize: "fourpart"
+    winget_id: "Google.Chrome"
+    update_url: "https://www.google.com/chrome/"
 
   - registry_name_pattern: "^Mozilla Firefox.*"
     publisher: "Mozilla"
@@ -15,6 +17,8 @@ mappings:
       type: cpe
       value: "cpe:2.3:a:mozilla:firefox"
     version_normalize: "semver"
+    winget_id: "Mozilla.Firefox"
+    update_url: "https://www.mozilla.org/firefox/"
 
   - registry_name: "Microsoft Edge"
     publisher: "Microsoft Corporation"
@@ -22,6 +26,8 @@ mappings:
       type: cpe
       value: "cpe:2.3:a:microsoft:edge_chromium"
     version_normalize: "fourpart"
+    winget_id: "Microsoft.Edge"
+    update_url: "https://www.microsoft.com/edge"
 
   - registry_name: "VLC media player"
     publisher: "VideoLAN"
@@ -29,6 +35,8 @@ mappings:
       type: cpe
       value: "cpe:2.3:a:videolan:vlc_media_player"
     version_normalize: "semver"
+    winget_id: "VideoLAN.VLC"
+    update_url: "https://www.videolan.org/vlc/"
 
   - registry_name_pattern: "^7-Zip.*"
     publisher: "Igor Pavlov"
@@ -36,6 +44,8 @@ mappings:
       type: cpe
       value: "cpe:2.3:a:7-zip:7-zip"
     version_normalize: "semver"
+    winget_id: "7zip.7zip"
+    update_url: "https://www.7-zip.org/"
 
   - registry_name_pattern: "^Notepad\\+\\+.*"
     publisher: "Notepad++ Team"
@@ -50,6 +60,8 @@ mappings:
       type: cpe
       value: "cpe:2.3:a:adobe:acrobat_reader_dc"
     version_normalize: "semver"
+    winget_id: "Adobe.Acrobat.Reader.64-bit"
+    update_url: "https://get.adobe.com/reader/"
 
   - registry_name_pattern: "^Python 3\\..*"
     publisher: "Python Software Foundation"
@@ -64,6 +76,8 @@ mappings:
       type: cpe
       value: "cpe:2.3:a:nodejs:node.js"
     version_normalize: "semver"
+    winget_id: "OpenJS.NodeJS"
+    update_url: "https://nodejs.org/"
 
   - registry_name: "Git"
     publisher: "The Git Development Community"
@@ -71,6 +85,8 @@ mappings:
       type: cpe
       value: "cpe:2.3:a:git-scm:git"
     version_normalize: "semver"
+    winget_id: "Git.Git"
+    update_url: "https://git-scm.com/"
 
   - registry_name_pattern: "^Microsoft Office.*"
     publisher: "Microsoft Corporation"
@@ -148,6 +164,8 @@ mappings:
       type: cpe
       value: "cpe:2.3:a:microsoft:visual_studio_code"
     version_normalize: "semver"
+    winget_id: "Microsoft.VisualStudioCode"
+    update_url: "https://code.visualstudio.com/"
 
   - registry_name_pattern: "^IntelliJ IDEA.*"
     publisher: "JetBrains s.r.o."

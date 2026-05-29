@@ -99,6 +99,18 @@ func TestMappingMatcher_VersionFromName(t *testing.T) {
 	}
 }
 
+func TestMappingMatcher_RemediationFields(t *testing.T) {
+	m, _ := NewDefaultMatcher()
+	app := scanner.InstalledApp{Name: "Google Chrome", Version: "120.0.6099.130", Publisher: "Google LLC"}
+	id, _, _ := m.Match(context.Background(), app)
+	if id.WingetID != "Google.Chrome" {
+		t.Errorf("WingetID = %q, want Google.Chrome", id.WingetID)
+	}
+	if id.UpdateURL == "" {
+		t.Error("UpdateURL boş olmamalı")
+	}
+}
+
 func TestMappingMatcher_VersionFallsBackToAppVersion(t *testing.T) {
 	m, _ := NewDefaultMatcher()
 	// Chrome'da version_from_name yok → app.Version kullanılmalı.

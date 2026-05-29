@@ -8,15 +8,22 @@ import (
 	"github.com/yemresalcan/mr-ducksafe/internal/store"
 )
 
+// Remediation bir uygulamanın güncelleme rehberi (sunum verisi, persist edilmez).
+type Remediation struct {
+	WingetID  string
+	UpdateURL string
+}
+
 // ScanResult tek bir taramanın özet sonucu.
 type ScanResult struct {
-	ScanID    int64
-	StartedAt time.Time
-	Finished  time.Time
-	Apps      []scanner.InstalledApp
-	Findings  []store.Finding
-	Unmatched []scanner.InstalledApp
-	Warnings  []ScanError
+	ScanID      int64
+	StartedAt   time.Time
+	Finished    time.Time
+	Apps        []scanner.InstalledApp
+	Findings    []store.Finding
+	Unmatched   []scanner.InstalledApp
+	Warnings    []ScanError
+	Remediation map[string]Remediation // appName → güncelleme rehberi
 }
 
 // Stage scan içindeki bir aşamayı belirtir.

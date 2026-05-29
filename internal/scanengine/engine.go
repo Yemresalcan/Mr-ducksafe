@@ -56,7 +56,7 @@ func (e *Engine) Run(ctx context.Context, progress chan<- Progress) (*ScanResult
 		return nil, err
 	}
 
-	result := &ScanResult{ScanID: scanID, StartedAt: started}
+	result := &ScanResult{ScanID: scanID, StartedAt: started, Remediation: map[string]Remediation{}}
 
 	apps, err := e.Scanner.Scan(ctx)
 	if err != nil {
@@ -80,6 +80,9 @@ func (e *Engine) Run(ctx context.Context, progress chan<- Progress) (*ScanResult
 			continue
 		}
 		toQuery = append(toQuery, matchedApp{app: app, id: id})
+		if id.WingetID != "" || id.UpdateURL != "" {
+			result.Remediation[app.Name] = Remediation{WingetID: id.WingetID, UpdateURL: id.UpdateURL}
+		}
 	}
 	emit(progress, Progress{Stage: StageMatch, Done: len(toQuery), Total: len(apps), Message: "matching complete"})
 

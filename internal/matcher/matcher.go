@@ -22,6 +22,8 @@ type Identifier struct {
 	Value     string
 	Ecosystem string // OSV ecosystem hint, boş olabilir
 	Version   string // sorguda kullanılacak çözülmüş versiyon (isimden veya app.Version)
+	WingetID  string // remediation: winget paket id'si, boş olabilir
+	UpdateURL string // remediation: manuel güncelleme linki, boş olabilir
 }
 
 // MatchConfidence eşleştirme güven seviyesi.
