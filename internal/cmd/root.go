@@ -23,6 +23,7 @@ func NewRootCmd() *cobra.Command {
 	root.PersistentFlags().StringVar(&flagDBPath, "db", "", "SQLite DB yolu (default: ~/.mr-ducksafe/mr-ducksafe.db)")
 
 	root.AddCommand(NewVersionCmd())
+	root.AddCommand(NewScanCmd())
 	return root
 }
 
