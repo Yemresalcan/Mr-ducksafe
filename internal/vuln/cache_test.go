@@ -1,4 +1,4 @@
-package osv
+package vuln
 
 import (
 	"context"
@@ -46,11 +46,25 @@ func TestCachedClient_ExpiredRecallsInner(t *testing.T) {
 	if _, err := c.Query(context.Background(), id, "1.0"); err != nil {
 		t.Fatal(err)
 	}
-	clock = clock.Add(25 * time.Hour) // TTL'i aş
+	clock = clock.Add(25 * time.Hour)
 	if _, err := c.Query(context.Background(), id, "1.0"); err != nil {
 		t.Fatal(err)
 	}
 	if stub.calls != 2 {
 		t.Errorf("expired sonrası 2 çağrı bekleniyor, alındı: %d", stub.calls)
+	}
+}
+
+func TestSeverity_Values(t *testing.T) {
+	all := []Severity{SeverityCritical, SeverityHigh, SeverityMedium, SeverityLow, SeverityUnknown}
+	seen := map[Severity]bool{}
+	for _, s := range all {
+		if s == "" {
+			t.Errorf("severity boş olamaz")
+		}
+		if seen[s] {
+			t.Errorf("duplicate severity: %s", s)
+		}
+		seen[s] = true
 	}
 }

@@ -1,0 +1,60 @@
+{
+  "vulnerabilities": [
+    {
+      "cve": {
+        "id": "CVE-2025-AFFECTED",
+        "descriptions": [
+          {"lang": "en", "value": "Affects git before 2.51.0"}
+        ],
+        "metrics": {
+          "cvssMetricV31": [
+            {"cvssData": {"baseScore": 8.1, "baseSeverity": "HIGH"}}
+          ]
+        },
+        "configurations": [
+          {
+            "nodes": [
+              {
+                "cpeMatch": [
+                  {
+                    "vulnerable": true,
+                    "criteria": "cpe:2.3:a:git-scm:git:*:*:*:*:*:*:*:*",
+                    "versionEndExcluding": "2.51.0"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "cve": {
+        "id": "CVE-2020-OLD",
+        "descriptions": [
+          {"lang": "en", "value": "Affects git before 2.40.0 only"}
+        ],
+        "metrics": {
+          "cvssMetricV31": [
+            {"cvssData": {"baseScore": 5.3, "baseSeverity": "MEDIUM"}}
+          ]
+        },
+        "configurations": [
+          {
+            "nodes": [
+              {
+                "cpeMatch": [
+                  {
+                    "vulnerable": true,
+                    "criteria": "cpe:2.3:a:git-scm:git:*:*:*:*:*:*:*:*",
+                    "versionEndExcluding": "2.40.0"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

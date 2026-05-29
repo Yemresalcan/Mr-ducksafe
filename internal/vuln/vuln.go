@@ -1,5 +1,6 @@
-// Package osv OSV.dev API'sine sorgu yapar.
-package osv
+// Package vuln güvenlik açığı veri sağlayıcıları için tarafsız tipler
+// ve arayüz tanımlar. OSV ve NVD gibi sağlayıcılar bu arayüzü uygular.
+package vuln
 
 import (
 	"context"
@@ -29,7 +30,7 @@ type Vulnerability struct {
 	Published     time.Time
 }
 
-// Client OSV.dev sorgulayıcı arayüzü.
+// Client bir güvenlik açığı veri kaynağını sorgulayan arayüz.
 type Client interface {
 	Query(ctx context.Context, id matcher.Identifier, version string) ([]Vulnerability, error)
 }

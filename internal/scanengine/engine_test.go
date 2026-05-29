@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/yemresalcan/mr-ducksafe/internal/matcher"
-	"github.com/yemresalcan/mr-ducksafe/internal/osv"
 	"github.com/yemresalcan/mr-ducksafe/internal/scanner"
 	"github.com/yemresalcan/mr-ducksafe/internal/store"
+	"github.com/yemresalcan/mr-ducksafe/internal/vuln"
 )
 
 type fakeScanner struct{ apps []scanner.InstalledApp }
@@ -23,9 +23,9 @@ func (fakeMatcher) Match(_ context.Context, app scanner.InstalledApp) (matcher.I
 	return matcher.Identifier{}, matcher.ConfidenceNone, nil
 }
 
-type fakeOSV struct{ vulns []osv.Vulnerability }
+type fakeOSV struct{ vulns []vuln.Vulnerability }
 
-func (f *fakeOSV) Query(_ context.Context, _ matcher.Identifier, _ string) ([]osv.Vulnerability, error) {
+func (f *fakeOSV) Query(_ context.Context, _ matcher.Identifier, _ string) ([]vuln.Vulnerability, error) {
 	return f.vulns, nil
 }
 
@@ -47,8 +47,8 @@ func TestEngine_Run_MatchesAndPersists(t *testing.T) {
 			{Name: "Unknown", Version: "2.0"},
 		}},
 		fakeMatcher{},
-		&fakeOSV{vulns: []osv.Vulnerability{
-			{ID: "CVE-1", Severity: osv.SeverityHigh, FixedVersions: []string{"1.1"}},
+		&fakeOSV{vulns: []vuln.Vulnerability{
+			{ID: "CVE-1", Severity: vuln.SeverityHigh, FixedVersions: []string{"1.1"}},
 		}},
 		st,
 	)

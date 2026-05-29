@@ -1,3 +1,6 @@
+// Package osv OSV.dev API'sine sorgu yapan vuln.Client implementasyonudur.
+// Açık kaynak ekosistem paketleri (npm, PyPI, crates.io, Linux distroları)
+// için uygundur. Masaüstü yazılımları için internal/nvd tercih edilir.
 package osv
 
 import (
@@ -12,6 +15,7 @@ import (
 	"time"
 
 	"github.com/yemresalcan/mr-ducksafe/internal/matcher"
+	"github.com/yemresalcan/mr-ducksafe/internal/vuln"
 )
 
 const defaultEndpoint = "https://api.osv.dev/v1/query"
@@ -41,7 +45,7 @@ func (c *HTTPClient) WithEndpoint(url string) *HTTPClient {
 }
 
 // Query Client arayüzünü uygular.
-func (c *HTTPClient) Query(ctx context.Context, id matcher.Identifier, version string) ([]Vulnerability, error) {
+func (c *HTTPClient) Query(ctx context.Context, id matcher.Identifier, version string) ([]vuln.Vulnerability, error) {
 	payload, err := buildPayload(id, version)
 	if err != nil {
 		return nil, err
@@ -152,7 +156,7 @@ type osvVuln struct {
 	} `json:"severity"`
 }
 
-func parseResponse(body []byte) ([]Vulnerability, error) {
+func parseResponse(body []byte) ([]vuln.Vulnerability, error) {
 	if len(body) == 0 {
 		return nil, nil
 	}
@@ -160,9 +164,9 @@ func parseResponse(body []byte) ([]Vulnerability, error) {
 	if err := json.Unmarshal(body, &r); err != nil {
 		return nil, fmt.Errorf("OSV response parse: %w", err)
 	}
-	out := make([]Vulnerability, 0, len(r.Vulns))
+	out := make([]vuln.Vulnerability, 0, len(r.Vulns))
 	for _, v := range r.Vulns {
-		out = append(out, Vulnerability{
+		out = append(out, vuln.Vulnerability{
 			ID:            v.ID,
 			Summary:       v.Summary,
 			Severity:      severityFromCVSS(v.Severity),
@@ -177,7 +181,7 @@ func parseResponse(body []byte) ([]Vulnerability, error) {
 func severityFromCVSS(items []struct {
 	Type  string `json:"type"`
 	Score string `json:"score"`
-}) Severity {
+}) vuln.Severity {
 	for _, s := range items {
 		if !strings.HasPrefix(s.Type, "CVSS") {
 			continue
@@ -185,16 +189,16 @@ func severityFromCVSS(items []struct {
 		score := extractBaseScore(s.Score)
 		switch {
 		case score >= 9.0:
-			return SeverityCritical
+			return vuln.SeverityCritical
 		case score >= 7.0:
-			return SeverityHigh
+			return vuln.SeverityHigh
 		case score >= 4.0:
-			return SeverityMedium
+			return vuln.SeverityMedium
 		case score > 0:
-			return SeverityLow
+			return vuln.SeverityLow
 		}
 	}
-	return SeverityUnknown
+	return vuln.SeverityUnknown
 }
 
 // extractBaseScore CVSS vector veya numeric score'dan base score çıkarır.

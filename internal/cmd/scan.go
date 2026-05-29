@@ -8,11 +8,12 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/yemresalcan/mr-ducksafe/internal/config"
 	"github.com/yemresalcan/mr-ducksafe/internal/matcher"
-	"github.com/yemresalcan/mr-ducksafe/internal/osv"
+	"github.com/yemresalcan/mr-ducksafe/internal/nvd"
 	"github.com/yemresalcan/mr-ducksafe/internal/report"
 	"github.com/yemresalcan/mr-ducksafe/internal/scanengine"
 	"github.com/yemresalcan/mr-ducksafe/internal/scanner"
 	"github.com/yemresalcan/mr-ducksafe/internal/store"
+	"github.com/yemresalcan/mr-ducksafe/internal/vuln"
 )
 
 var (
@@ -62,9 +63,16 @@ func runScan(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	osvClient := osv.NewCachedClient(osv.NewHTTPClient())
+	nvdClient := nvd.NewClient()
+	if !nvdClient.HasAPIKey() {
+		fmt.Fprintln(cmd.ErrOrStderr(),
+			"ipucu: NVD_API_KEY ortam değişkeni ayarlanmamış — tarama yavaş olabilir (5 istek/30sn).")
+		fmt.Fprintln(cmd.ErrOrStderr(),
+			"       Ücretsiz key: https://nvd.nist.gov/developers/request-an-api-key")
+	}
+	vulnClient := vuln.NewCachedClient(nvdClient)
 
-	eng := scanengine.New(sc, m, osvClient, st)
+	eng := scanengine.New(sc, m, vulnClient, st)
 	result, err := eng.Run(ctx, nil)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "scan failed:", err)

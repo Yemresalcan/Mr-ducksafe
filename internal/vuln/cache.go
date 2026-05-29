@@ -1,4 +1,4 @@
-package osv
+package vuln
 
 import (
 	"context"
@@ -12,6 +12,7 @@ const defaultCacheTTL = 24 * time.Hour
 
 // CachedClient bir Client'ı in-memory TTL cache ile sarmalayarak
 // aynı (identifier, version) sorgusunun tekrar atılmasını önler.
+// Sağlayıcıdan bağımsızdır — OSV veya NVD fark etmez.
 type CachedClient struct {
 	inner Client
 	ttl   time.Duration

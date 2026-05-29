@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/yemresalcan/mr-ducksafe/internal/matcher"
+	"github.com/yemresalcan/mr-ducksafe/internal/vuln"
 )
 
 func TestHTTPClient_Query_Success(t *testing.T) {
@@ -38,7 +39,7 @@ func TestHTTPClient_Query_Success(t *testing.T) {
 	if vulns[0].ID != "CVE-2022-26485" {
 		t.Errorf("ID = %s, want CVE-2022-26485", vulns[0].ID)
 	}
-	if vulns[0].Severity != SeverityHigh {
+	if vulns[0].Severity != vuln.SeverityHigh {
 		t.Errorf("severity = %s, want high (CVSS vector default)", vulns[0].Severity)
 	}
 	if len(vulns[0].FixedVersions) != 1 || vulns[0].FixedVersions[0] != "97.0.2" {

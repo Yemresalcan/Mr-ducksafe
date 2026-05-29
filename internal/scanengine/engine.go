@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/yemresalcan/mr-ducksafe/internal/matcher"
-	"github.com/yemresalcan/mr-ducksafe/internal/osv"
 	"github.com/yemresalcan/mr-ducksafe/internal/scanner"
 	"github.com/yemresalcan/mr-ducksafe/internal/store"
+	"github.com/yemresalcan/mr-ducksafe/internal/vuln"
 )
 
 const defaultConcurrency = 5
@@ -19,13 +19,13 @@ const defaultConcurrency = 5
 type Engine struct {
 	Scanner     scanner.Scanner
 	Matcher     matcher.Matcher
-	OSV         osv.Client
+	OSV         vuln.Client
 	Store       store.Store
 	Concurrency int
 }
 
 // New verilen bağımlılıklarla yeni Engine oluşturur.
-func New(s scanner.Scanner, m matcher.Matcher, o osv.Client, st store.Store) *Engine {
+func New(s scanner.Scanner, m matcher.Matcher, o vuln.Client, st store.Store) *Engine {
 	return &Engine{
 		Scanner:     s,
 		Matcher:     m,
