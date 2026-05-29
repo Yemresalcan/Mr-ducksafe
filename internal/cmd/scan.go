@@ -23,6 +23,8 @@ var (
 	flagScanFormat        string
 	flagScanFailOn        string
 	flagScanShowUnmatched bool
+	flagScanDetails       bool
+	flagScanApp           string
 )
 
 // NewScanCmd `mr-ducksafe scan` komutu.
@@ -35,6 +37,8 @@ func NewScanCmd() *cobra.Command {
 	c.Flags().StringVar(&flagScanFormat, "format", "table", "çıktı formatı: table | json | markdown")
 	c.Flags().StringVar(&flagScanFailOn, "fail-on", "", "eşik aşıldığında exit 1: critical | high | medium | low")
 	c.Flags().BoolVar(&flagScanShowUnmatched, "show-unmatched", false, "eşleştirilemeyen yazılımları da göster")
+	c.Flags().BoolVar(&flagScanDetails, "details", false, "özet yerine tüm CVE'leri tablo halinde göster")
+	c.Flags().StringVar(&flagScanApp, "app", "", "sadece adı bu metni içeren uygulamayı göster")
 	return c
 }
 
@@ -90,6 +94,8 @@ func runScan(cmd *cobra.Command, _ []string) error {
 
 	if err := report.Write(cmd.OutOrStdout(), result, report.Format(flagScanFormat), report.Options{
 		ShowUnmatched: flagScanShowUnmatched,
+		Details:       flagScanDetails,
+		AppFilter:     flagScanApp,
 	}); err != nil {
 		return err
 	}
