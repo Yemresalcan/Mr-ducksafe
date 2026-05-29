@@ -47,5 +47,6 @@ type Store interface {
 	ListScans(ctx context.Context, limit int) ([]Scan, error)
 	GetScan(ctx context.Context, id int64) (Scan, []Finding, error)
 	CleanupStaleRunning(ctx context.Context, olderThan time.Duration) (int, error)
+	PruneOlderThan(ctx context.Context, olderThan time.Duration) (int, error)
 	Close() error
 }

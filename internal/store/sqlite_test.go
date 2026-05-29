@@ -99,6 +99,23 @@ func TestSQLiteStore_CleanupStaleRunning(t *testing.T) {
 	}
 }
 
+func TestSQLiteStore_PruneOlderThan(t *testing.T) {
+	s := newTestStore(t)
+	ctx := context.Background()
+
+	old := time.Now().Add(-48 * time.Hour)
+	_, _ = s.SaveScan(ctx, Scan{StartedAt: old, Status: StatusSuccess})
+	_, _ = s.SaveScan(ctx, Scan{StartedAt: time.Now(), Status: StatusSuccess})
+
+	n, err := s.PruneOlderThan(ctx, 24*time.Hour)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n != 1 {
+		t.Errorf("prune count = %d, want 1", n)
+	}
+}
+
 func TestSQLiteStore_ListScans(t *testing.T) {
 	s := newTestStore(t)
 	ctx := context.Background()

@@ -157,6 +157,17 @@ func (s *SQLiteStore) GetScan(ctx context.Context, id int64) (Scan, []Finding, e
 	return sc, findings, rows.Err()
 }
 
+func (s *SQLiteStore) PruneOlderThan(ctx context.Context, olderThan time.Duration) (int, error) {
+	cutoff := time.Now().Add(-olderThan)
+	res, err := s.db.ExecContext(ctx,
+		`DELETE FROM scans WHERE started_at < ?`, cutoff)
+	if err != nil {
+		return 0, err
+	}
+	n, _ := res.RowsAffected()
+	return int(n), nil
+}
+
 func (s *SQLiteStore) CleanupStaleRunning(ctx context.Context, olderThan time.Duration) (int, error) {
 	cutoff := time.Now().Add(-olderThan)
 	res, err := s.db.ExecContext(ctx, `
