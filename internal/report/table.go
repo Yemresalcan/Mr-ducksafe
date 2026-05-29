@@ -3,15 +3,36 @@ package report
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
 	"github.com/yemresalcan/mr-ducksafe/internal/scanengine"
+	"github.com/yemresalcan/mr-ducksafe/internal/store"
 )
+
+// filterByApp sonucu sadece adı filtreyi (case-insensitive) içeren
+// uygulamanın bulgularına daraltır.
+func filterByApp(r *scanengine.ScanResult, filter string) *scanengine.ScanResult {
+	f := strings.ToLower(filter)
+	out := *r // sığ kopya; slice'ları aşağıda değiştiriyoruz
+	var findings []store.Finding
+	for _, fn := range r.Findings {
+		if strings.Contains(strings.ToLower(fn.AppName), f) {
+			findings = append(findings, fn)
+		}
+	}
+	out.Findings = findings
+	return &out
+}
 
 func writeTable(w io.Writer, r *scanengine.ScanResult, opts Options) error {
 	if opts.NoColor {
 		color.NoColor = true
+	}
+
+	if opts.AppFilter != "" {
+		r = filterByApp(r, opts.AppFilter)
 	}
 
 	counts := r.CountBySeverity()

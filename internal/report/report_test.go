@@ -3,9 +3,11 @@ package report
 import (
 	"bytes"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/yemresalcan/mr-ducksafe/internal/scanengine"
 	"github.com/yemresalcan/mr-ducksafe/internal/scanner"
 	"github.com/yemresalcan/mr-ducksafe/internal/store"
@@ -36,6 +38,9 @@ func fixtureResult() *scanengine.ScanResult {
 		Unmatched: []scanner.InstalledApp{
 			{Name: "Some Random Tool", Version: "1.0", Publisher: "Nobody"},
 		},
+		Remediation: map[string]scanengine.Remediation{
+			"Firefox": {WingetID: "Mozilla.Firefox", UpdateURL: "https://mozilla.org/firefox/"},
+		},
 	}
 }
 
@@ -64,6 +69,55 @@ func TestWrite_Markdown_Golden(t *testing.T) {
 	}
 	if normalize(buf.String()) != normalize(string(want)) {
 		t.Errorf("Markdown çıktısı golden ile eşleşmiyor.\nGot:\n%s\nWant:\n%s", buf.String(), string(want))
+	}
+}
+
+func TestWrite_Summary_GroupsAndAdvises(t *testing.T) {
+	color.NoColor = true
+	var buf bytes.Buffer
+	if err := Write(&buf, fixtureResult(), FormatTable, Options{}); err != nil {
+		t.Fatal(err)
+	}
+	out := buf.String()
+
+	wants := []string{
+		"güncellenmesi gereken 1 yazılım",      // gruplu başlık
+		"Firefox",                               // uygulama adı
+		"1 yüksek",                              // severity sayımı
+		"Yakında güncelle",                      // aciliyet (high)
+		"Bellek hatası",                         // risk (use-after-free keyword)
+		"winget upgrade --id Mozilla.Firefox",   // remediation
+		"--details",                             // detay ipucu
+	}
+	for _, want := range wants {
+		if !strings.Contains(out, want) {
+			t.Errorf("özet çıktısı %q içermeli.\nÇıktı:\n%s", want, out)
+		}
+	}
+}
+
+func TestWrite_Summary_NoFindings(t *testing.T) {
+	color.NoColor = true
+	var buf bytes.Buffer
+	r := fixtureResult()
+	r.Findings = nil
+	if err := Write(&buf, r, FormatTable, Options{}); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(buf.String(), "açık bulunamadı") {
+		t.Errorf("bulgu yokken 'açık bulunamadı' beklenir, alındı: %q", buf.String())
+	}
+}
+
+func TestWrite_AppFilter_ShowsTable(t *testing.T) {
+	color.NoColor = true
+	var buf bytes.Buffer
+	if err := Write(&buf, fixtureResult(), FormatTable, Options{AppFilter: "firefox"}); err != nil {
+		t.Fatal(err)
+	}
+	// --app verilince tam tabloya gider; CVE id görünmeli.
+	if !strings.Contains(buf.String(), "CVE-2022-26485") {
+		t.Errorf("app filtreli tablo CVE içermeli, alındı:\n%s", buf.String())
 	}
 }
 

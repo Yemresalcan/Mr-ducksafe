@@ -21,13 +21,18 @@ const (
 type Options struct {
 	ShowUnmatched bool
 	NoColor       bool
+	Details       bool   // true → tam CVE tablosu; false → gruplu özet (varsayılan)
+	AppFilter     string // boş değilse sadece bu uygulamaya odaklan (substring)
 }
 
 // Write verilen format ile sonucu w'ye yazar.
 func Write(w io.Writer, result *scanengine.ScanResult, format Format, opts Options) error {
 	switch format {
 	case FormatTable:
-		return writeTable(w, result, opts)
+		if opts.Details || opts.AppFilter != "" {
+			return writeTable(w, result, opts)
+		}
+		return writeSummary(w, result, opts)
 	case FormatJSON:
 		return writeJSON(w, result, opts)
 	case FormatMarkdown:
