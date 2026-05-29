@@ -155,6 +155,7 @@ mappings:
       type: cpe
       value: "cpe:2.3:a:jetbrains:intellij_idea"
     version_normalize: "semver"
+    version_from_name: "(\\d{4}\\.\\d+(?:\\.\\d+)?)"
 
   - registry_name_pattern: "^PyCharm.*"
     publisher: "JetBrains s.r.o."
@@ -162,6 +163,7 @@ mappings:
       type: cpe
       value: "cpe:2.3:a:jetbrains:pycharm"
     version_normalize: "semver"
+    version_from_name: "(\\d{4}\\.\\d+(?:\\.\\d+)?)"
 
   - registry_name_pattern: "^GoLand.*"
     publisher: "JetBrains s.r.o."
@@ -169,6 +171,7 @@ mappings:
       type: cpe
       value: "cpe:2.3:a:jetbrains:goland"
     version_normalize: "semver"
+    version_from_name: "(\\d{4}\\.\\d+(?:\\.\\d+)?)"
 
   - registry_name_pattern: "^WebStorm.*"
     publisher: "JetBrains s.r.o."
@@ -176,6 +179,7 @@ mappings:
       type: cpe
       value: "cpe:2.3:a:jetbrains:webstorm"
     version_normalize: "semver"
+    version_from_name: "(\\d{4}\\.\\d+(?:\\.\\d+)?)"
 
   - registry_name_pattern: "^Docker Desktop.*"
     publisher: "Docker Inc."

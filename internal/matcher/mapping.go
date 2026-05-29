@@ -21,8 +21,10 @@ type mappingEntry struct {
 	} `yaml:"identifier"`
 	EcosystemHint    string `yaml:"ecosystem_hint"`
 	VersionNormalize string `yaml:"version_normalize"`
+	VersionFromName  string `yaml:"version_from_name"` // isimden versiyon çıkaran regex (1 capture group)
 
-	pattern *regexp.Regexp // pattern compiled cache
+	pattern     *regexp.Regexp // registry_name_pattern compiled cache
+	versionFrom *regexp.Regexp // version_from_name compiled cache
 }
 
 type mappingFile struct {
@@ -49,6 +51,13 @@ func NewMappingMatcher(yamlData []byte) (*MappingMatcher, error) {
 			}
 			f.Mappings[i].pattern = re
 		}
+		if vp := f.Mappings[i].VersionFromName; vp != "" {
+			re, err := regexp.Compile(vp)
+			if err != nil {
+				return nil, fmt.Errorf("version_from_name %q derlenemedi: %w", vp, err)
+			}
+			f.Mappings[i].versionFrom = re
+		}
 	}
 	return &MappingMatcher{entries: f.Mappings}, nil
 }
@@ -66,10 +75,23 @@ func (m *MappingMatcher) Match(_ context.Context, app scanner.InstalledApp) (Ide
 				Type:      IdentifierType(e.Identifier.Type),
 				Value:     e.Identifier.Value,
 				Ecosystem: e.EcosystemHint,
+				Version:   e.resolveVersion(app),
 			}, ConfidenceHigh, nil
 		}
 	}
 	return Identifier{}, ConfidenceNone, nil
+}
+
+// resolveVersion sorguda kullanılacak versiyonu belirler: version_from_name
+// regex'i isimde eşleşirse oradan çıkarır (örn. "IntelliJ IDEA 2025.2.2"),
+// aksi halde Registry'deki app.Version kullanılır.
+func (e mappingEntry) resolveVersion(app scanner.InstalledApp) string {
+	if e.versionFrom != nil {
+		if mm := e.versionFrom.FindStringSubmatch(app.Name); len(mm) >= 2 && mm[1] != "" {
+			return mm[1]
+		}
+	}
+	return app.Version
 }
 
 func (e mappingEntry) matches(app scanner.InstalledApp) bool {

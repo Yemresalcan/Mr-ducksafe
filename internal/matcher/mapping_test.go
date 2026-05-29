@@ -73,3 +73,38 @@ func TestMappingMatcher_Match(t *testing.T) {
 		})
 	}
 }
+
+func TestMappingMatcher_VersionFromName(t *testing.T) {
+	m, err := NewDefaultMatcher()
+	if err != nil {
+		t.Fatalf("NewDefaultMatcher: %v", err)
+	}
+
+	// IntelliJ DisplayName'inde marketing versiyonu var; Registry version'u
+	// build numarası (252.x). version_from_name isimden 2025.2.2 çıkarmalı.
+	app := scanner.InstalledApp{
+		Name:      "IntelliJ IDEA 2025.2.2",
+		Version:   "252.26199.169",
+		Publisher: "JetBrains s.r.o.",
+	}
+	id, conf, err := m.Match(context.Background(), app)
+	if err != nil {
+		t.Fatalf("Match: %v", err)
+	}
+	if conf != ConfidenceHigh {
+		t.Fatalf("confidence = %v, want high", conf)
+	}
+	if id.Version != "2025.2.2" {
+		t.Errorf("resolved version = %q, want 2025.2.2 (isimden)", id.Version)
+	}
+}
+
+func TestMappingMatcher_VersionFallsBackToAppVersion(t *testing.T) {
+	m, _ := NewDefaultMatcher()
+	// Chrome'da version_from_name yok → app.Version kullanılmalı.
+	app := scanner.InstalledApp{Name: "Google Chrome", Version: "120.0.6099.130", Publisher: "Google LLC"}
+	id, _, _ := m.Match(context.Background(), app)
+	if id.Version != "120.0.6099.130" {
+		t.Errorf("resolved version = %q, want 120.0.6099.130 (app.Version)", id.Version)
+	}
+}

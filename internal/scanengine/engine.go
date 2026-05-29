@@ -136,7 +136,11 @@ func (e *Engine) queryAll(ctx context.Context, scanID int64, items []matchedApp,
 				<-sem
 			}()
 
-			vulns, err := e.OSV.Query(ctx, m.id, m.app.Version)
+			queryVersion := m.id.Version
+			if queryVersion == "" {
+				queryVersion = m.app.Version
+			}
+			vulns, err := e.OSV.Query(ctx, m.id, queryVersion)
 			mu.Lock()
 			if err != nil {
 				warnings = append(warnings, ScanError{Stage: StageQuery, AppName: m.app.Name, Cause: err})

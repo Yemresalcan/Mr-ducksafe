@@ -16,11 +16,12 @@ const (
 	IdentifierTypeCPE  IdentifierType = "cpe"
 )
 
-// Identifier OSV.dev'e sorgulanabilir bir tekil yazılım kimliği.
+// Identifier sorgulanabilir bir tekil yazılım koordinatı.
 type Identifier struct {
 	Type      IdentifierType
 	Value     string
 	Ecosystem string // OSV ecosystem hint, boş olabilir
+	Version   string // sorguda kullanılacak çözülmüş versiyon (isimden veya app.Version)
 }
 
 // MatchConfidence eşleştirme güven seviyesi.
