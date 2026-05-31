@@ -299,6 +299,6 @@ Henüz belirlenmedi (MIT veya Apache-2.0). MVP build'inden önce eklenecek.
 
 <div align="center">
 
-**Eline sağlık. Açıkları bulup düzeltmek bu kadar basit olmamalıydı.** 🦆
+**Açıkları bulup düzeltmek bu kadar basit olmamalıydı.** 🦆
 
 </div>
