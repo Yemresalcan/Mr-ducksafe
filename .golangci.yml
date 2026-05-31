@@ -1,28 +1,31 @@
+version: "2"
+
 run:
   timeout: 5m
 
 linters:
+  default: none
   enable:
-    - govet
+    - bodyclose
     - errcheck
-    - staticcheck
-    - unused
+    - gosec
+    - govet
     - ineffassign
-    - gosimple
+    - misspell
+    - staticcheck
+    - unconvert
+    - unused
+  settings:
+    gosec:
+      excludes:
+        - G104  # audited error returns
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - gosec
+
+formatters:
+  enable:
     - gofmt
     - goimports
-    - misspell
-    - unconvert
-    - bodyclose
-    - gosec
-
-linters-settings:
-  gosec:
-    excludes:
-      - G104  # audited error returns
-
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - gosec
