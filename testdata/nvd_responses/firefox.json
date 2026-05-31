@@ -1,0 +1,32 @@
+{
+  "vulnerabilities": [
+    {
+      "cve": {
+        "id": "CVE-2022-FIREFOX",
+        "descriptions": [
+          {"lang": "en", "value": "Use-after-free in Firefox before 100.5"}
+        ],
+        "metrics": {
+          "cvssMetricV31": [
+            {"cvssData": {"baseScore": 8.8, "baseSeverity": "HIGH"}}
+          ]
+        },
+        "configurations": [
+          {
+            "nodes": [
+              {
+                "cpeMatch": [
+                  {
+                    "vulnerable": true,
+                    "criteria": "cpe:2.3:a:mozilla:firefox:*:*:*:*:*:*:*:*",
+                    "versionEndExcluding": "100.5"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
