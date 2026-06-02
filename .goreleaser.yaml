@@ -1,0 +1,98 @@
+version: 2
+
+project_name: mr-ducksafe
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: mr-ducksafe
+    main: ./cmd/mr-ducksafe
+    binary: mr-ducksafe
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X github.com/yemresalcan/mr-ducksafe/internal/cmd.Version={{.Version}}
+    goos:
+      - windows
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+archives:
+  - id: default
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+sboms:
+  - id: archive-sbom
+    artifacts: archive
+    documents:
+      - "{{ .ArtifactName }}.sbom.json"
+
+changelog:
+  sort: asc
+  use: github
+  groups:
+    - title: Features
+      regexp: "^.*feat(\\(.+\\))?:.*$"
+      order: 0
+    - title: Bug Fixes
+      regexp: "^.*fix(\\(.+\\))?:.*$"
+      order: 1
+    - title: Build & Release
+      regexp: "^.*(build|ci|chore)(\\(.+\\))?:.*$"
+      order: 2
+    - title: Documentation
+      regexp: "^.*docs(\\(.+\\))?:.*$"
+      order: 3
+    - title: Other
+      order: 999
+  filters:
+    exclude:
+      - "^test:"
+      - "^style:"
+      - "Merge pull request"
+
+release:
+  github:
+    owner: yemresalcan
+    name: mr-ducksafe
+  draft: false
+  prerelease: auto
+  header: |
+    ## mr-ducksafe {{ .Tag }}
+
+    Windows kurulu yazılımları için NVD CVE tarayıcı.
+
+    İndir, çalıştır:
+
+    ```sh
+    mr-ducksafe scan
+    ```
+  footer: |
+    ---
+    SHA256 checksum'lar `checksums.txt`'de. SBOM'lar her arşiv için `.sbom.json` olarak yayınlandı.
