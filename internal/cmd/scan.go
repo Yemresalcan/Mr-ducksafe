@@ -25,6 +25,7 @@ var (
 	flagScanShowUnmatched bool
 	flagScanDetails       bool
 	flagScanApp           string
+	flagScanOutput        string
 )
 
 // NewScanCmd `mr-ducksafe scan` komutu.
@@ -39,6 +40,7 @@ func NewScanCmd() *cobra.Command {
 	c.Flags().BoolVar(&flagScanShowUnmatched, "show-unmatched", false, "eşleştirilemeyen yazılımları da göster")
 	c.Flags().BoolVar(&flagScanDetails, "details", false, "özet yerine tüm CVE'leri tablo halinde göster")
 	c.Flags().StringVar(&flagScanApp, "app", "", "sadece adı bu metni içeren uygulamayı göster")
+	c.Flags().StringVarP(&flagScanOutput, "output", "o", "", "raporu bu dosyaya yaz (varsayılan: stdout)")
 	return c
 }
 
@@ -92,12 +94,24 @@ func runScan(cmd *cobra.Command, _ []string) error {
 		os.Exit(2)
 	}
 
-	if err := report.Write(cmd.OutOrStdout(), result, report.Format(flagScanFormat), report.Options{
+	out := cmd.OutOrStdout()
+	if flagScanOutput != "" {
+		f, err := os.Create(flagScanOutput)
+		if err != nil {
+			return fmt.Errorf("output dosyası aç: %w", err)
+		}
+		defer f.Close()
+		out = f
+	}
+	if err := report.Write(out, result, report.Format(flagScanFormat), report.Options{
 		ShowUnmatched: flagScanShowUnmatched,
 		Details:       flagScanDetails,
 		AppFilter:     flagScanApp,
 	}); err != nil {
 		return err
+	}
+	if flagScanOutput != "" {
+		fmt.Fprintf(stderr, "Rapor yazıldı: %s\n", flagScanOutput)
 	}
 
 	if shouldFail(result, flagScanFailOn) {
