@@ -1,0 +1,47 @@
+name: Bug Report
+description: Beklenmedik bir davranış bildir
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Sorunu net bir şekilde anlatmak için aşağıdaki alanları doldur.
+  - type: input
+    id: version
+    attributes:
+      label: mr-ducksafe sürümü
+      description: "`mr-ducksafe version` çıktısı"
+      placeholder: "v0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: İşletim sistemi
+      placeholder: "Windows 11 Pro 23H2"
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Ne oldu?
+      description: Beklediğin ne, ne aldın?
+      placeholder: "scan komutu X'te crash etti..."
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Yeniden üretme adımları
+      placeholder: |
+        1. `mr-ducksafe scan --format=json`
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Loglar / çıktı
+      description: Varsa `--verbose` ile aldığın çıktı
+      render: shell

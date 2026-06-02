@@ -1,0 +1,22 @@
+name: Feature Request
+description: Yeni bir özellik öner
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Hangi sorunu çözüyor?
+      description: Karşılaştığın gerçek bir durum varsa anlat.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Önerilen çözüm
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatifler / mevcut workaround'lar

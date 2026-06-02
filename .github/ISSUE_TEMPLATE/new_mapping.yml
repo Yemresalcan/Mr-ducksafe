@@ -1,0 +1,40 @@
+name: Yeni Mapping
+description: mappings.yaml'a yeni bir uygulama eşleştirmesi öner
+title: "[Mapping]: <App Adı>"
+labels: ["mapping"]
+body:
+  - type: input
+    id: app
+    attributes:
+      label: Uygulama adı
+      placeholder: "Notepad++"
+    validations:
+      required: true
+  - type: input
+    id: publisher
+    attributes:
+      label: Vendor / Publisher
+      placeholder: "Notepad++ Team"
+  - type: input
+    id: cpe
+    attributes:
+      label: CPE (NVD'de doğrulanmış)
+      description: "https://nvd.nist.gov/products/cpe/search üzerinden ara"
+      placeholder: "cpe:2.3:a:notepad-plus-plus:notepad\\+\\+"
+    validations:
+      required: true
+  - type: input
+    id: registry_name
+    attributes:
+      label: Windows Registry DisplayName örneği
+      placeholder: "Notepad++ (64-bit x64)"
+  - type: input
+    id: winget
+    attributes:
+      label: winget ID (varsa)
+      placeholder: "Notepad++.Notepad++"
+  - type: input
+    id: update_url
+    attributes:
+      label: Güncelleme URL'si (winget yoksa)
+      placeholder: "https://notepad-plus-plus.org/downloads/"
