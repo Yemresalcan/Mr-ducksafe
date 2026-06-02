@@ -2,13 +2,16 @@
 
 # 🦆 mr-ducksafe
 
-**Windows kurulu yazılımları için NVD CVE tarayıcı — tek dosya, rehberli.**
+**Windows kurulu yazılımları için NVD CVE tarayıcı — tek binary, terminalden.**
 
 500+ CVE değil → ~10 aksiyon maddesi. Risk insan dilinde, çözüm tek komut.
 
-[![Go](https://img.shields.io/badge/Go-1.22%2B-00ADD8?logo=go)](https://go.dev/)
+[![CI](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/ci.yml/badge.svg)](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/ci.yml)
+[![Release](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/release.yml/badge.svg)](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/release.yml)
+[![codecov](https://codecov.io/gh/yemresalcan/mr-ducksafe/branch/master/graph/badge.svg)](https://codecov.io/gh/yemresalcan/mr-ducksafe)
+[![Go](https://img.shields.io/badge/Go-1.25%2B-00ADD8?logo=go)](https://go.dev/)
 [![Platform](https://img.shields.io/badge/platform-Windows-blue)]()
-[![Status](https://img.shields.io/badge/status-MVP-yellow)]()
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Data](https://img.shields.io/badge/data-NVD%202.0-red)](https://nvd.nist.gov/)
 
 </div>
@@ -24,18 +27,34 @@ Bilgisayarındaki Adobe Acrobat, Chrome, Office, Java... bunların **eski sürü
 - 📊 **Rehberli özet:** uygulama bazında gruplu, severity'ye göre sıralı
 - 🧠 **İnsan dilinde risk:** "Use-after-free in XSLT" değil → "bellek hatası yoluyla uygulama ele geçirilebilir"
 - 🛠️ **Aksiyon odaklı:** her bulgu için `winget upgrade` veya güncelleme linki
-- 🖥️ **Opsiyonel web UI:** `mr-ducksafe serve` → lokal dashboard
+- 🗂️ **Lokal geçmiş:** her tarama SQLite'a yazılır, `history` ile erişilir
+- ⚙️ **CI dostu:** `--format=json`, `--output FILE`, `--fail-on=high`, `NO_COLOR` desteği
 - 🔒 **Gizlilik:** tarama tamamen lokal; sadece anonim `{vendor, product, version}` NVD'ye gider
 
 **Platform:** Windows. Linux/macOS v0.2'de planlanıyor.
 
 ---
 
-## Hızlı Başlangıç
+## Kurulum
 
-### 1. Build
+### Hazır binary (önerilen)
 
-Go 1.22+ gerekli.
+[GitHub Releases](https://github.com/yemresalcan/mr-ducksafe/releases) üzerinden işletim sistemine uygun arşivi indir, `mr-ducksafe.exe` (veya `mr-ducksafe`) dosyasını PATH'e koy.
+
+Her release için **SHA256 checksum** ve **SBOM** (`*.sbom.json`, CycloneDX) yayınlanıyor.
+
+### Scoop (Windows)
+
+```powershell
+# Manifest URL ile direkt kurulum (bucket gerekmez):
+scoop install https://github.com/yemresalcan/mr-ducksafe/releases/latest/download/mr-ducksafe.json
+```
+
+> Scoop manifest sonraki sürümde release artifact'i olarak yayınlanacak.
+
+### Kaynaktan build
+
+Go 1.25+ gerekli.
 
 ```sh
 git clone https://github.com/yemresalcan/mr-ducksafe
@@ -43,7 +62,7 @@ cd mr-ducksafe
 go build -o mr-ducksafe.exe ./cmd/mr-ducksafe
 ```
 
-### 2. NVD API key (önerilen — 10x hızlı)
+### NVD API key (önerilen — 10x hızlı)
 
 [Ücretsiz key al](https://nvd.nist.gov/developers/request-an-api-key), sonra:
 
@@ -52,10 +71,18 @@ setx NVD_API_KEY "<key>"
 ```
 > Yeni terminal aç. `setx` mevcut oturumu etkilemez.
 
-### 3. Tara
+---
+
+## Hızlı Kullanım
 
 ```sh
-mr-ducksafe scan
+mr-ducksafe scan                       # rehberli özet
+mr-ducksafe scan --details             # tüm CVE tablosu
+mr-ducksafe scan --app "Chrome"        # sadece Chrome
+mr-ducksafe scan -o report.json --format=json  # CI/script için dosyaya yaz
+mr-ducksafe scan --fail-on=high        # high+ bulgu → exit 1 (CI)
+mr-ducksafe history                    # geçmiş tarama kayıtları
+mr-ducksafe prune --older-than=30d     # eski kayıtları sil
 ```
 
 ---
@@ -119,57 +146,41 @@ Flags:
       --details          özet yerine tüm CVE'leri tablo halinde göster
       --fail-on string   eşik aşıldığında exit 1: critical | high | medium | low
       --format string    çıktı formatı: table | json | markdown (default "table")
+  -o, --output string    raporu bu dosyaya yaz (varsayılan: stdout)
       --show-unmatched   eşleştirilemeyen yazılımları da göster
 ```
 
-**Örnekler:**
+### `history` — geçmiş taramaları listele
 
-```sh
-mr-ducksafe scan                      # rehberli özet (varsayılan)
-mr-ducksafe scan --details            # tüm CVE tablosu
-mr-ducksafe scan --app "Chrome"       # sadece Chrome
-mr-ducksafe scan --show-unmatched     # eşleştirilemeyenleri de göster
-mr-ducksafe scan --format=json        # CI/script için
-mr-ducksafe scan --format=markdown    # PR/issue'ya yapıştırılabilir
-mr-ducksafe scan --fail-on=high       # high+ bulgu → exit 1 (CI)
 ```
+$ mr-ducksafe history --limit 5
 
-### `serve` — lokal web UI
-
-```sh
-mr-ducksafe serve --port 8080
-# tarayıcıdan http://127.0.0.1:8080
+ID  Tarih                Durum    Süre  Bulgu
+12  2026-06-03 14:21:08  success  18s   521
+11  2026-06-02 09:14:22  success  21s   519
+10  2026-06-01 18:02:11  failed   4s    -
 ```
-
-Dashboard'dan "Şimdi Tara" butonu, geçmiş liste, scan detay.
-Default `127.0.0.1`. Ağa açmak için `--bind 0.0.0.0` (auth yok — dikkat).
 
 ### `prune` — eski kayıtları sil
 
 ```sh
-mr-ducksafe prune --older-than=30d    # 30 günden eski scan'leri sil
+mr-ducksafe prune --older-than=30d
 ```
 
 ### `version`
 
 ```sh
 $ mr-ducksafe version
-mr-ducksafe dev
+mr-ducksafe v0.1.0
 ```
 
-### Tüm komutlar
+### Global flag'ler
 
-```
-$ mr-ducksafe --help
-
-Available Commands:
-  completion  Generate the autocompletion script for the specified shell
-  help        Help about any command
-  prune       Belirli yaştan eski scan kayıtlarını sil
-  scan        Kurulu yazılımları tarayıp CVE raporu üret
-  serve       Lokal web UI başlat
-  version     mr-ducksafe sürümünü göster
-```
+| Flag | Açıklama |
+|---|---|
+| `--db PATH` | SQLite DB yolu (default: `~/.mr-ducksafe/mr-ducksafe.db`) |
+| `--no-color` | Renkli çıktıyı kapat (`NO_COLOR` env de onurlandırılır) |
+| `--verbose` | Ayrıntılı log |
 
 ---
 
@@ -178,9 +189,8 @@ Available Commands:
 | Code | Anlam |
 |---|---|
 | 0 | Başarılı, `--fail-on` eşiği aşılmadı |
-| 1 | Eşik aşıldı (`--fail-on`) |
+| 1 | Eşik aşıldı (`--fail-on`) veya CLI hatası |
 | 2 | Tarama hatası (NVD erişilemedi, scanner başarısız) |
-| 64 | Kullanım hatası (yanlış flag) |
 
 ---
 
@@ -197,7 +207,7 @@ Available Commands:
 ## Mimari (özet)
 
 ```
-cmd/mr-ducksafe ──► internal/cmd (Cobra: scan/serve/prune/version)
+cmd/mr-ducksafe ──► internal/cmd (Cobra: scan/history/prune/version)
                          │
                          ▼
                   internal/scanengine ──► orkestrasyon (goroutine + semaphore)
@@ -213,7 +223,6 @@ cmd/mr-ducksafe ──► internal/cmd (Cobra: scan/serve/prune/version)
                   internal/report  ──► table | json | markdown | özet
                   internal/advice  ──► severity + keyword → risk metni
                   internal/tui     ──► banner + spinner
-                  internal/server  ──► lokal HTTP + embedded UI
 ```
 
 **Anahtar prensip:** Veri kaynağı (`vuln.Client`) interface arkasında. NVD ve OSV ikisi de implement eder, scanengine fark etmez.
@@ -232,19 +241,22 @@ cmd/mr-ducksafe ──► internal/cmd (Cobra: scan/serve/prune/version)
 ## Geliştirme
 
 ```sh
-go test ./...                           # tüm testler
-go test ./... -v                        # verbose
+go test ./... -race                     # tüm testler
+go test ./... -coverprofile=cover.out   # coverage
 golangci-lint run                       # lint
 
-# Cross-platform release build (Windows host)
+# Lokal cross-platform release smoke (goreleaser kurulu olmalı)
+goreleaser release --snapshot --clean
+
+# Manuel cross-platform build
 .\scripts\build.ps1 -Version "0.1.0"
-# dist/ altında: windows-amd64, linux-amd64, darwin-amd64, darwin-arm64 (~15 MB her biri)
+./scripts/build.sh 0.1.0
 ```
 
 **Dokümanlar:**
 - Tasarım: [docs/superpowers/specs/2026-05-23-mr-ducksafe-design.md](docs/superpowers/specs/2026-05-23-mr-ducksafe-design.md)
+- CLI-only pivot: [docs/superpowers/specs/2026-06-03-cli-only-pivot-design.md](docs/superpowers/specs/2026-06-03-cli-only-pivot-design.md)
 - Implementasyon planı: [docs/superpowers/plans/2026-05-24-mr-ducksafe-mvp.md](docs/superpowers/plans/2026-05-24-mr-ducksafe-mvp.md)
-- Rehberli görünüm tasarımı: [docs/superpowers/specs/2026-05-28-guided-remediation-design.md](docs/superpowers/specs/2026-05-28-guided-remediation-design.md)
 
 ---
 
@@ -266,6 +278,8 @@ golangci-lint run                       # lint
 
 CPE'leri [nvd.nist.gov/products/cpe/search](https://nvd.nist.gov/products/cpe/search) üzerinden doğrula.
 
+Bug, feature veya yeni mapping önerisi için [issue template'lerini](.github/ISSUE_TEMPLATE/) kullan.
+
 ---
 
 ## Yol Haritası
@@ -275,14 +289,15 @@ CPE'leri [nvd.nist.gov/products/cpe/search](https://nvd.nist.gov/products/cpe/se
 - NVD CPE + version range eşleştirme
 - 50 curated mapping
 - Rehberli özet + winget remediation + Seviye A açıklama
-- CLI + lokal web UI
+- CLI (`scan` / `history` / `prune`), SQLite geçmiş, JSON/Markdown çıktı
+- Multi-platform release (Windows/Linux/macOS binary) + SBOM
 
 **v0.2 (planlanan)**
 - Linux scanner (dpkg, rpm, pacman)
 - macOS scanner (Homebrew, `/Applications`)
-- SSE canlı progress (web UI'da spinner)
 - Mapping listesi 200+'e (topluluk PR'larıyla)
 - "Düzeltme" sütununda `versionEndIncluding` desteği
+- Scoop bucket + Homebrew tap
 
 **v0.3+ (fikir)**
 - Seviye B: `--explain` flag'i + opsiyonel LLM ile CVE-başına açıklama
@@ -293,7 +308,7 @@ CPE'leri [nvd.nist.gov/products/cpe/search](https://nvd.nist.gov/products/cpe/se
 
 ## Lisans
 
-Henüz belirlenmedi (MIT veya Apache-2.0). MVP build'inden önce eklenecek.
+[MIT](LICENSE) — Copyright (c) 2026 Yunus Emre Salcan
 
 ---
 
