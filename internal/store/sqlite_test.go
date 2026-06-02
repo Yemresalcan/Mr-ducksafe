@@ -70,32 +70,27 @@ func TestSQLiteStore_SaveAndGetScan(t *testing.T) {
 	}
 }
 
-func TestSQLiteStore_CleanupStaleRunning(t *testing.T) {
+func TestSQLiteStore_CountFindings(t *testing.T) {
 	s := newTestStore(t)
 	ctx := context.Background()
 
-	id, err := s.SaveScan(ctx, Scan{
-		StartedAt: time.Now().Add(-1 * time.Hour),
-		Status:    StatusRunning,
-	})
+	id, err := s.SaveScan(ctx, Scan{StartedAt: time.Now(), Status: StatusSuccess})
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	n, err := s.CleanupStaleRunning(ctx, 10*time.Minute)
+	findings := []Finding{
+		{AppName: "A", AppVersion: "1", CVEID: "CVE-1", Severity: "low", Summary: "x"},
+		{AppName: "B", AppVersion: "2", CVEID: "CVE-2", Severity: "high", Summary: "y"},
+	}
+	if err := s.AppendFindings(ctx, id, findings); err != nil {
+		t.Fatal(err)
+	}
+	n, err := s.CountFindings(ctx, id)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if n != 1 {
-		t.Errorf("cleanup count = %d, want 1", n)
-	}
-
-	sc, _, err := s.GetScan(ctx, id)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if sc.Status != StatusInterrupted {
-		t.Errorf("status = %s, want interrupted", sc.Status)
+	if n != 2 {
+		t.Errorf("count = %d, want 2", n)
 	}
 }
 

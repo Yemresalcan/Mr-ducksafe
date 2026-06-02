@@ -168,16 +168,12 @@ func (s *SQLiteStore) PruneOlderThan(ctx context.Context, olderThan time.Duratio
 	return int(n), nil
 }
 
-func (s *SQLiteStore) CleanupStaleRunning(ctx context.Context, olderThan time.Duration) (int, error) {
-	cutoff := time.Now().Add(-olderThan)
-	res, err := s.db.ExecContext(ctx, `
-		UPDATE scans SET status = ?, finished_at = ?
-		WHERE status = ? AND started_at < ?`,
-		StatusInterrupted, time.Now(), StatusRunning, cutoff,
-	)
-	if err != nil {
-		return 0, err
+func (s *SQLiteStore) CountFindings(ctx context.Context, scanID int64) (int, error) {
+	var n int
+	if err := s.db.QueryRowContext(ctx,
+		`SELECT COUNT(*) FROM findings WHERE scan_id = ?`, scanID,
+	).Scan(&n); err != nil {
+		return 0, fmt.Errorf("count findings: %w", err)
 	}
-	n, _ := res.RowsAffected()
-	return int(n), nil
+	return n, nil
 }
