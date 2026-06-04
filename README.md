@@ -14,9 +14,13 @@
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Data](https://img.shields.io/badge/data-NVD%202.0-red)](https://nvd.nist.gov/)
 
+<br>
+
+<img src="docs/demo.gif" alt="mr-ducksafe canlı demo — scan / --app / history / --fail-on" width="960">
+
 </div>
 
----
+-
 
 ## Neden?
 

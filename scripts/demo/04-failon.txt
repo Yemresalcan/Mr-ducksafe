@@ -1,0 +1,19 @@
+﻿mr-ducksafe scan #15 — 143 kurulu yazılım tarandı (122 eşleştirilemedi)
+Bulgular: KRITIK 1  YÜKSEK 1  ORTA 6  DÜŞÜK 4
+
+┌──────┬───────────────┬────────────────┬────────────────┬──────────┬────────────────────────────────────────────────────────────────────────┐
+│ SEV  │   UYGULAMA    │     SÜRÜM      │      CVE       │ DÜZELTME │                                  ÖZET                                  │
+├──────┼───────────────┼────────────────┼────────────────┼──────────┼────────────────────────────────────────────────────────────────────────┤
+│ DÜŞK │ Google Chrome │ 148.0.7778.217 │ CVE-2008-5915  │          │ An unspecified function in the JavaScript implementation in Google ... │
+│ YÜKS │ Google Chrome │ 148.0.7778.217 │ CVE-2009-1598  │          │ Google Chrome executes DOM calls in response to a javascript: URI i... │
+│ ORTA │ Google Chrome │ 148.0.7778.217 │ CVE-2010-1731  │          │ Google Chrome on the HTC Hero allows remote attackers to cause a de... │
+│ ORTA │ Google Chrome │ 148.0.7778.217 │ CVE-2011-3389  │          │ The SSL protocol, as used in certain configurations in Microsoft Wi... │
+│ DÜŞK │ Google Chrome │ 148.0.7778.217 │ CVE-2012-4929  │          │ The TLS protocol 1.2 and earlier, as used in Mozilla Firefox, Googl... │
+│ DÜŞK │ Google Chrome │ 148.0.7778.217 │ CVE-2012-4930  │          │ The SPDY protocol 3 and earlier, as used in Mozilla Firefox, Google... │
+│ DÜŞK │ Google Chrome │ 148.0.7778.217 │ CVE-2015-4000  │          │ The TLS protocol 1.2 and earlier, when a DHE_EXPORT ciphersuite is ... │
+│ ORTA │ Google Chrome │ 148.0.7778.217 │ CVE-2016-7152  │          │ The HTTPS protocol does not consider the role of the TCP congestion... │
+│ ORTA │ Google Chrome │ 148.0.7778.217 │ CVE-2016-7153  │          │ The HTTP/2 protocol does not consider the role of the TCP congestio... │
+│ KRIT │ Google Chrome │ 148.0.7778.217 │ CVE-2013-6647  │          │ A use-after-free in AnimationController::endAnimationUpdate in Goog... │
+│ ORTA │ Google Chrome │ 148.0.7778.217 │ CVE-2013-6662  │          │ Google Chrome caches TLS sessions before certificate validation occ... │
+│ ORTA │ Google Chrome │ 148.0.7778.217 │ CVE-2018-10229 │          │ A hardware vulnerability in GPU memory modules allows attackers to ... │
+└──────┴───────────────┴────────────────┴────────────────┴──────────┴────────────────────────────────────────────────────────────────────────┘

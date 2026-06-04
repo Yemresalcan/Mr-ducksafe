@@ -1,0 +1,88 @@
+﻿mr-ducksafe — güncellenmesi gereken 14 yazılım (525 açık)
+
+  KRIT  Microsoft Teams Meeting Add-in for Microsoft Office  1.25.28902
+          1 kritik · 9 yüksek · 4 orta · 1 düşük
+          Aciliyet: Acilen güncelle — aktif sömürülebilir.
+          Risk:     Uzaktan, internet üzerinden bilgisayarınızda kod çalıştırılabilir.
+          Çözüm:    Uygulamayı en son sürüme güncelleyin.
+
+  KRIT  Google Chrome  148.0.7778.217
+          1 kritik · 1 yüksek · 6 orta · 4 düşük
+          Aciliyet: Acilen güncelle — aktif sömürülebilir.
+          Risk:     Bellek hatası yoluyla uygulama ele geçirilebilir.
+          Çözüm:    winget upgrade --id Google.Chrome
+
+  KRIT  AnyDesk  ad 9.6.1
+          3 kritik · 6 yüksek · 1 orta
+          Aciliyet: Acilen güncelle — aktif sömürülebilir.
+          Risk:     Uzaktan, internet üzerinden bilgisayarınızda kod çalıştırılabilir.
+          Çözüm:    Uygulamayı en son sürüme güncelleyin.
+
+  KRIT  Microsoft OneDrive  26.084.0504.0007
+          1 kritik · 6 yüksek · 2 orta
+          Aciliyet: Acilen güncelle — aktif sömürülebilir.
+          Risk:     Saldırgan sistemdeki yetkilerini yükseltebilir.
+          Çözüm:    Uygulamayı en son sürüme güncelleyin.
+
+  KRIT  Node.js  22.17.0
+          1 kritik · 3 yüksek · 1 orta
+          Aciliyet: Acilen güncelle — aktif sömürülebilir.
+          Risk:     Uzaktan, internet üzerinden bilgisayarınızda kod çalıştırılabilir.
+          Çözüm:    winget upgrade --id OpenJS.NodeJS
+
+  YÜKS  Adobe Acrobat Reader DC - Turkish  20.012.20043
+          247 yüksek · 135 orta · 27 düşük
+          Aciliyet: Yakında güncelle — ciddi risk.
+          Risk:     Uzaktan, internet üzerinden bilgisayarınızda kod çalıştırılabilir.
+          Çözüm:    winget upgrade --id Adobe.Acrobat.Reader.64-bit
+
+  YÜKS  Microsoft Office Standard 2019 - tr-tr  16.0.20026.20112
+          14 yüksek · 2 orta
+          Aciliyet: Yakında güncelle — ciddi risk.
+          Risk:     Uzaktan, internet üzerinden bilgisayarınızda kod çalıştırılabilir.
+          Çözüm:    Uygulamayı en son sürüme güncelleyin.
+
+  YÜKS  Microsoft Office Standard 2019 - en-us  16.0.20026.20112
+          14 yüksek · 2 orta
+          Aciliyet: Yakında güncelle — ciddi risk.
+          Risk:     Uzaktan, internet üzerinden bilgisayarınızda kod çalıştırılabilir.
+          Çözüm:    Uygulamayı en son sürüme güncelleyin.
+
+  YÜKS  Microsoft Visual Studio Code (User)  1.123.0
+          12 yüksek · 2 orta
+          Aciliyet: Yakında güncelle — ciddi risk.
+          Risk:     Uzaktan, internet üzerinden bilgisayarınızda kod çalıştırılabilir.
+          Çözüm:    winget upgrade --id Microsoft.VisualStudioCode
+
+  YÜKS  Microsoft Edge  148.0.3967.96
+          2 yüksek · 6 orta
+          Aciliyet: Yakında güncelle — ciddi risk.
+          Risk:     Uzaktan, internet üzerinden bilgisayarınızda kod çalıştırılabilir.
+          Çözüm:    winget upgrade --id Microsoft.Edge
+
+  YÜKS  IntelliJ IDEA 2025.2.2  252.26199.169
+          2 yüksek · 2 orta · 1 düşük
+          Aciliyet: Yakında güncelle — ciddi risk.
+          Risk:     Bu sürümde ciddi güvenlik açıkları var; saldırgan sisteminize zarar verebilir.
+          Çözüm:    Uygulamayı en son sürüme güncelleyin.
+
+  YÜKS  Adobe Premiere Pro 2025  25.4.1
+          4 yüksek
+          Aciliyet: Yakında güncelle — ciddi risk.
+          Risk:     Uzaktan, internet üzerinden bilgisayarınızda kod çalıştırılabilir.
+          Çözüm:    Uygulamayı en son sürüme güncelleyin.
+
+  YÜKS  Git  2.50.0
+          1 yüksek
+          Aciliyet: Yakında güncelle — ciddi risk.
+          Risk:     Bu sürümde ciddi güvenlik açıkları var; saldırgan sisteminize zarar verebilir.
+          Çözüm:    winget upgrade --id Git.Git
+
+  YÜKS  Docker Desktop  4.42.1
+          1 yüksek
+          Aciliyet: Yakında güncelle — ciddi risk.
+          Risk:     Bu sürümde ciddi güvenlik açıkları var; saldırgan sisteminize zarar verebilir.
+          Çözüm:    Uygulamayı en son sürüme güncelleyin.
+
+  Detay:  mr-ducksafe scan --details        (tüm CVE listesi)
+          mr-ducksafe scan --app "<isim>"   (tek uygulama)
