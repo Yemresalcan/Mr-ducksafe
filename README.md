@@ -6,6 +6,8 @@
 
 500+ CVE değil → ~10 aksiyon maddesi. Risk insan dilinde, çözüm tek komut.
 
+**🇹🇷 Türkçe** · [🇬🇧 English](README.en.md)
+
 [![CI](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/ci.yml/badge.svg)](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/ci.yml)
 [![Release](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/release.yml/badge.svg)](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/release.yml)
 [![codecov](https://codecov.io/gh/yemresalcan/mr-ducksafe/branch/master/graph/badge.svg)](https://codecov.io/gh/yemresalcan/mr-ducksafe)
