@@ -541,6 +541,7 @@ class Scene:
     def __init__(self, dur, fn, sfx=None, name="", chapter=None):
         self.dur, self.fn, self.name, self.chapter = dur, fn, name, chapter
         self.sfx = sfx or []  # [(local_time, kind)]
+        self.vo = []          # [(local_time, mono float32 @ SR)] — filled by attach_voiceover
 
 
 def caption(canvas, W, t, parts, y=54, size=44):
@@ -908,7 +909,7 @@ def short_scenes(W=1080, H=1920):
         a3 = ap(t, 3.2)
         txt(c, "bilinen CVE · tek taramada", cx, 1190 + (1 - a3) * 20, "semi", 50, PEACH, "mt", a3)
 
-    scenes.append(Scene(4.8, hook, [(1.3, "riser"), (3.0, "pop")]))
+    scenes.append(Scene(4.8, hook, [(1.3, "riser"), (3.0, "pop")], "hook"))
 
     summary = load_capture("01-scan.txt")
     sc = TermScript()
@@ -936,7 +937,8 @@ def short_scenes(W=1080, H=1920):
             rich(c, [("→  ", OVER0, "bold"), ("14 aksiyon", GREEN, "black")], cx, y + 180, 72,
                  "mt", clamp(e))
 
-    scenes.append(Scene(sc.duration, scan, [(x, "click") for x in sc.clicks()] + [(t_done + 0.2, "pop")]))
+    scenes.append(Scene(sc.duration, scan, [(x, "click") for x in sc.clicks()] + [(t_done + 0.2, "pop")],
+                        "scan"))
 
     def plain(c, t):
         a = ap(t, 0.1)
@@ -961,7 +963,7 @@ def short_scenes(W=1080, H=1920):
         put(c, panel_sprite(w - 80, 110, 16, CRUST, SURF0), x + 40, y + 300, alpha=e3)
         txt(c, "winget upgrade --id Google.Chrome", x + 70, y + 333, "monob", 34, TEAL, alpha=e3)
 
-    scenes.append(Scene(5.6, plain, [(0.4, "tick"), (1.3, "tick"), (2.2, "pop")]))
+    scenes.append(Scene(5.6, plain, [(0.4, "tick"), (1.3, "tick"), (2.2, "pop")], "plain"))
 
     feats = [("📦", "Tek .exe — kurulum yok"), ("🏛", "Resmi NVD CVE verisi"),
              ("🧠", "Riskler sade dilde"), ("🛠", "winget ile tek komut çözüm"),
@@ -978,7 +980,7 @@ def short_scenes(W=1080, H=1920):
             put(c, emoji_sprite(em, 64), 120, y + 62, "lm", e)
             txt(c, s, 220, y + 62, "semi", 46, TEXT, "lm", e)
 
-    scenes.append(Scene(6.4, features, [(0.5 + i * 0.32, "tick") for i in range(6)]))
+    scenes.append(Scene(6.4, features, [(0.5 + i * 0.32, "tick") for i in range(6)], "features"))
 
     def cta(c, t):
         e = ease_back(clamp((t - 0.1) / 0.6))
@@ -997,7 +999,7 @@ def short_scenes(W=1080, H=1920):
         put(c, emoji_sprite("⭐", 52), cx - w5 / 2, 1220, "lm", a)
         txt(c, s5, cx - w5 / 2 + 72, 1220, "bold", 52, WHITE, "lm", a)
 
-    scenes.append(Scene(6.0, cta, [(0.1, "pop"), (1.4, "tick")]))
+    scenes.append(Scene(6.0, cta, [(0.1, "pop"), (1.4, "tick")], "cta"))
     return scenes
 
 
@@ -1112,27 +1114,161 @@ def sfx_layer(events, total, seed=3):
     return out
 
 
+MUSIC_LEVEL = 0.16   # music peak (≈ -16 dBFS) — kept well under the voice
+MUSIC_DUCK = 0.45    # extra attenuation while someone is speaking
+SFX_LEVEL = 0.55
+VOICE_LEVEL = 0.92
+
+
 def write_wav(path, scenes, total):
     L, R = synth_music(total)
+    n = len(L)
+    m_peak = max(np.abs(L).max(), np.abs(R).max(), 1e-6)
+    L, R = L / m_peak, R / m_peak
     events = []
+    voice = np.zeros(n)
     t0 = 0.0
     for i, sc in enumerate(scenes):
         if i:
             events.append((t0, "whoosh"))
         events += [(t0 + lt, k) for lt, k in sc.sfx]
+        for lt, clip in sc.vo:
+            j = int((t0 + lt) * SR)
+            seg = clip[: max(0, n - j)]
+            voice[j:j + len(seg)] += seg
         t0 += sc.dur
-    fx = sfx_layer(events, total)
-    n = min(len(L), len(fx))
-    L, R = L[:n] + fx[:n], R[:n] + fx[:n]
-    peak = max(np.abs(L).max(), np.abs(R).max(), 1e-6)
-    gain = 0.85 / peak
-    L, R = np.tanh(L * gain * 1.1), np.tanh(R * gain * 1.1)
+    fx = sfx_layer(events, total)[:n]
+    # sidechain-style ducking envelope from the voice track
+    act = (np.abs(voice) > 0.02).astype(float)
+    win = int(0.25 * SR)
+    act = np.convolve(act, np.ones(win) / win, mode="same")
+    env = np.clip(act * 4, 0, 1)
+    k = int(0.3 * SR)
+    env = np.convolve(env, np.ones(k) / k, mode="same")
+    mg = MUSIC_LEVEL * (1 - MUSIC_DUCK * env)
+    vfx = fx * SFX_LEVEL * (1 - 0.5 * env) + voice * VOICE_LEVEL
+    L, R = L * mg + vfx, R * mg + vfx
+    L, R = np.tanh(L * 1.05), np.tanh(R * 1.05)
     data = (np.stack([L, R], 1)[: int(total * SR)] * 32000).astype(np.int16)
     with wave.open(str(path), "wb") as w:
         w.setnchannels(2)
         w.setsampwidth(2)
         w.setframerate(SR)
         w.writeframes(data.tobytes())
+
+
+# --------------------------------------------------------------------------
+# Voice-over (Turkish narration)
+# --------------------------------------------------------------------------
+# Texts are written the way they should be *pronounced* (e.g. "mister dakseyf"
+# for mr-ducksafe) because Turkish TTS voices read English words letter by letter.
+# (earliest start within the scene, text). A line starts at that time or right
+# after the previous line, whichever is later; a scene is lengthened
+# automatically when its narration needs more time.
+VO = {
+    "youtube": {
+        "hook": [(0.3, "Sıradan bir Windows bilgisayarında, kaç bilinen güvenlik açığı var?"),
+                 (3.2, "Bu makinede tam beş yüz yirmi beş.")],
+        "problem": [(0.3, "Chrome, AnyDesk, Office, Adobe Rîdır... Eski sürümde kalan her uygulama, "
+                          "herkesin bildiği açıklar demek."),
+                    (0.0, "Peki bunların hepsini elle takip etmek? Kimse istemez.")],
+        "intro": [(0.2, "İşte mister dakseyf. Windows'taki kurulu yazılımlar için ücretsiz ve "
+                        "açık kaynak bir güvenlik açığı tarayıcısı."),
+                  (0.0, "Tek bir dosya. Kurulum yok, hesap yok.")],
+        "how": [(0.4, "Önce Windows kayıt defterinden kurulu programları okur."),
+                (0.0, "Sonra her birini, resmi bir ürün kimliğiyle eşleştirir."),
+                (0.0, "Ardından, Amerikan ulusal açık veritabanında, kurulu sürümü etkileyen açıkları sorgular."),
+                (0.0, "Son olarak riski sade bir dille anlatır, ve çözüm komutunu verir.")],
+        "scan": [(0.4, "Tek komut yeterli."),
+                 (3.4, "Yüz kırk üç program tarandı, yirmi bir tanesi eşleşti."),
+                 (6.8, "Sonuç: beş yüz yirmi beş açık. Ama karşınızda, en kritikten başlayarak, "
+                       "sadece on dört net aksiyon var.")],
+        "plain": [(0.3, "Veritabanındaki kayıt teknik ve uzun."),
+                  (0.0, "mister dakseyf ise ne anlama geldiğini söyler: bellek hatası yoluyla, "
+                        "uygulama ele geçirilebilir."),
+                  (0.0, "Ve çözümü verir: tek bir güncelleme komutu.")],
+        "details": [(0.4, "Tek bir uygulamanın tüm açıklarını görmek isterseniz, uygulama adını "
+                          "verin ve ayrıntılı tabloyu açın.")],
+        "ci": [(0.4, "Sürekli entegrasyon için de hazır."),
+               (0.0, "Belirlediğiniz eşik aşılırsa çıkış kodu bir olur, ve iş akışı kırmızıya döner."),
+               (0.0, "Rapor da makinenin okuyabileceği bir dosya olarak kaydedilir.")],
+        "history": [(0.4, "Her tarama, bilgisayarınızdaki yerel bir veritabanına yazılır."),
+                    (0.0, "Tarama tamamen yerelde çalışır. Dışarıya yalnızca üretici, ürün ve sürüm "
+                          "bilgisi gider. Telemetri yok.")],
+        "outro": [(0.4, "mister dakseyf'i GitHub'dan indirin, tek komutla taramaya başlayın."),
+                  (0.0, "Beğendiyseniz, projeye bir yıldız vermeyi unutmayın.")],
+    },
+    "short": {
+        "hook": [(0.2, "Bilgisayarında kaç güvenlik açığı var?"),
+                 (0.2, "Bu makinede, beş yüz yirmi beş.")],
+        "scan": [(0.3, "Tek komut: mister dakseyf sken."),
+                 (2.6, "Yüz kırk üç program tarandı."),
+                 (0.3, "Beş yüz yirmi beş açık. Ama sadece on dört aksiyon.")],
+        "plain": [(0.2, "Jargon yok. Riski sade dille söyler, çözüm komutunu da verir.")],
+        "features": [(0.3, "Tek dosya, resmi veritabanı, sürekli entegrasyon desteği, "
+                           "ve yüzde yüz yerel.")],
+        "cta": [(0.3, "Ücretsiz ve açık kaynak. Link açıklamada.")],
+    },
+}
+
+TTS_CACHE = Path(tempfile.gettempdir()) / "ducksafe-tts"
+
+
+def _tts_engine():
+    """DUCKSAFE_TTS selects the voice:
+         piper:/path/to/tr_TR-xxx.onnx   neural Piper voice (best quality)
+         espeak:mb-tr2 | espeak:tr        espeak-ng (+ MBROLA) fallback
+       Default: espeak:tr."""
+    return os.environ.get("DUCKSAFE_TTS", "espeak:tr")
+
+
+def tts(text: str) -> np.ndarray:
+    import hashlib
+    eng = _tts_engine()
+    TTS_CACHE.mkdir(exist_ok=True)
+    key = hashlib.sha1(f"{eng}|{text}".encode()).hexdigest()[:16]
+    out = TTS_CACHE / f"{key}.wav"
+    if not out.exists():
+        raw = TTS_CACHE / f"{key}.raw.wav"
+        kind, _, arg = eng.partition(":")
+        if kind == "piper":
+            subprocess.run([sys.executable, "-m", "piper", "-m", arg, "-f", str(raw),
+                            "--length-scale", "1.05", "--sentence-silence", "0.25", "--", text],
+                           check=True, capture_output=True)
+        elif kind == "espeak":
+            subprocess.run(["espeak-ng", "-v", arg or "tr", "-s", "158", "-p", "42", "-g", "2",
+                            "-w", str(raw), text], check=True, capture_output=True)
+        else:
+            raise SystemExit(f"unknown DUCKSAFE_TTS engine {eng!r}")
+        # clean up + gentle broadcast-style chain
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-ac", "1",
+                        "-ar", str(SR), "-af",
+                        "highpass=f=80,lowpass=f=9500,"
+                        "acompressor=threshold=-20dB:ratio=3:attack=5:release=120,"
+                        "aecho=0.8:0.5:28:0.08",
+                        str(out)], check=True)
+        raw.unlink(missing_ok=True)
+    with wave.open(str(out), "rb") as w:
+        a = np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float32) / 32768
+    # trim leading/trailing silence
+    nz = np.flatnonzero(np.abs(a) > 0.01)
+    if len(nz):
+        a = a[max(0, nz[0] - int(0.03 * SR)): nz[-1] + int(0.08 * SR)]
+    return a / max(np.abs(a).max(), 1e-6) * 0.9
+
+
+def attach_voiceover(kind, scenes):
+    lines = VO.get(kind, {})
+    for sc in scenes:
+        cursor = 0.0
+        sc.vo = []
+        for off, text in lines.get(sc.name, []):
+            clip = tts(text)
+            start = max(off, cursor)
+            sc.vo.append((start, clip))
+            cursor = start + len(clip) / SR + 0.15
+        if sc.vo:
+            sc.dur = max(sc.dur, cursor + 0.7)
 
 
 # --------------------------------------------------------------------------
@@ -1165,6 +1301,8 @@ def _render_bytes(i):
 
 def render_video(kind):
     W, H, scenes = (1920, 1080, yt_scenes()) if kind == "youtube" else (1080, 1920, short_scenes())
+    if os.environ.get("DUCKSAFE_TTS", "") != "off":
+        attach_voiceover(kind, scenes)
     _G.update(W=W, H=H, scenes=scenes)
     total = sum(s.dur for s in scenes)
     nframes = int(round(total * FPS))
