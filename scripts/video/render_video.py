@@ -2,8 +2,8 @@
 """Render the mr-ducksafe promo videos and thumbnail.
 
 Outputs (in docs/media/):
-  mr-ducksafe-youtube.mp4   1920x1080, ~90 s  (YouTube)
-  mr-ducksafe-short.mp4     1080x1920, ~35 s  (YouTube Shorts / Reels / TikTok)
+  mr-ducksafe-youtube.mp4   1920x1080, ~2 min (YouTube)
+  mr-ducksafe-short.mp4     1080x1920, ~37 s  (YouTube Shorts / Reels / TikTok)
   thumbnail.png             1280x720          (YouTube thumbnail, README)
 
 Every frame is drawn with Pillow and piped to ffmpeg; the soundtrack
@@ -15,7 +15,11 @@ Usage:
     python scripts/video/render_video.py thumbnail       # youtube | short | thumbnail
     python scripts/video/render_video.py preview youtube # a few still frames only
 
-Requires Python 3.10+, Pillow, numpy and ffmpeg on PATH.
+Requires Python 3.10+, Pillow, numpy and ffmpeg on PATH. English narration uses
+Kokoro-82M (Apache-2.0) via `pip install kokoro-onnx` and the files
+onnx/model.onnx + voices/af_heart.bin from huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX:
+    KOKORO_MODEL=.../model.onnx KOKORO_VOICES=.../af_heart.bin python scripts/video/render_video.py
+Set DUCKSAFE_TTS=off to render without narration.
 """
 from __future__ import annotations
 
@@ -62,7 +66,7 @@ MAUVE = (203, 166, 247)
 DUCK = (255, 204, 77)
 CREAM = (245, 224, 220)
 
-SEV_COLOR = {"KRIT": RED, "YÜKS": PEACH, "ORTA": YELLOW, "DÜŞK": OVER0}
+SEV_COLOR = {"CRIT": RED, "HIGH": PEACH, "MED": YELLOW, "LOW": OVER0}
 
 # --------------------------------------------------------------------------
 # Fonts
@@ -306,8 +310,8 @@ def S(text, color=TEXT, style=""):
     return (text, color, style)
 
 
-SEV_RE = re.compile(r"^(\s*)(KRIT|YÜKS|ORTA|DÜŞK)(\s+)(.+?)(\s{2,})(\S.*)$")
-COUNT_WORDS = {"kritik": RED, "yüksek": PEACH, "orta": YELLOW, "düşük": OVER0}
+SEV_RE = re.compile(r"^(\s*)(CRIT|HIGH|MED|LOW)(\s+)(.+?)(\s{2,})(\S.*)$")
+COUNT_WORDS = {"critical": RED, "high": PEACH, "medium": YELLOW, "low": OVER0}
 
 
 def colorize(line: str):
@@ -321,7 +325,7 @@ def colorize(line: str):
         return [S(lead), S(sev, SEV_COLOR[sev], "badge"), S(sp), S(app, WHITE, "b"),
                 S(sp2), S(ver, OVER0)]
     lead = line[: len(line) - len(line.lstrip())]
-    if re.match(r"^\d+ (kritik|yüksek|orta|düşük)", s):
+    if re.match(r"^\d+ (critical|high|medium|low)", s):
         segs = [S(lead)]
         for i, part in enumerate(s.split(" · ")):
             if i:
@@ -329,18 +333,18 @@ def colorize(line: str):
             word = part.split(" ", 1)[1]
             segs.append(S(part, COUNT_WORDS.get(word, TEXT)))
         return segs
-    for label, col in (("Aciliyet:", None), ("Risk:", TEXT), ("Çözüm:", TEAL), ("Detay:", OVER0)):
+    for label, col in (("Urgency:", None), ("Risk:", TEXT), ("Fix:", TEAL), ("Details:", OVER0)):
         if s.startswith(label):
             rest = line[len(lead) + len(label):]
             if col is None:
-                col = RED if "Acilen" in rest else PEACH
-            style = "b" if label == "Çözüm:" and "winget" in rest else ""
+                col = RED if "immediately" in rest else PEACH
+            style = "b" if label == "Fix:" and "winget" in rest else ""
             return [S(lead), S(label, OVER0), S(rest, col, style)]
     if s.startswith("mr-ducksafe —") or s.startswith("mr-ducksafe scan #"):
         return [S(lead), S(s, MAUVE, "b")]
-    if s.startswith("Bulgular:"):
-        segs = [S("Bulgular:", MAUVE, "b")]
-        for name, col in (("KRITIK", RED), ("YÜKSEK", PEACH), ("ORTA", YELLOW), ("DÜŞÜK", OVER0)):
+    if s.startswith("Findings:"):
+        segs = [S("Findings:", MAUVE, "b")]
+        for name, col in (("CRITICAL", RED), ("HIGH", PEACH), ("MEDIUM", YELLOW), ("LOW", OVER0)):
             mm = re.search(name + r" (\d+)", s)
             if mm:
                 segs.append(S(f"  {name} {mm.group(1)}", col))
@@ -358,7 +362,7 @@ def colorize(line: str):
                 segs.append(S(c, SEV_COLOR[cs], "b"))
             elif cs.startswith("CVE-"):
                 segs.append(S(c, SKY))
-            elif cs in ("SEV", "UYGULAMA", "SÜRÜM", "CVE", "DÜZELTME", "ÖZET"):
+            elif cs in ("SEV", "APPLICATION", "VERSION", "CVE", "FIXED IN", "SUMMARY"):
                 segs.append(S(c, MAUVE, "b"))
             elif i == 2:
                 segs.append(S(c, WHITE))
@@ -379,7 +383,7 @@ def colorize(line: str):
 
 
 def load_capture(name):
-    lines = (DEMO / name).read_text(encoding="utf-8-sig").splitlines()
+    lines = (DEMO / "en" / name).read_text(encoding="utf-8-sig").splitlines()
     while lines and not lines[-1].strip():
         lines.pop()
     return [colorize(ln) for ln in lines]
@@ -389,7 +393,7 @@ BANNER = [
     [S("")],
     [S("  __", DUCK)],
     [S(" <(o )___", DUCK), S("   "), S("mr-ducksafe", SKY, "b"), S(" v0.1.0", OVER0)],
-    [S("  ( ._> /", DUCK), S("   "), S("yerel kurulu yazilim CVE tarayici", OVER0)],
+    [S("  ( ._> /", DUCK), S("   "), S("CVE scanner for installed software", OVER0)],
     [S("   `---'", DUCK)],
 ]
 PROMPT = "PS C:\\> "
@@ -557,8 +561,8 @@ def yt_scenes(W=1920, H=1080):
     # 1 — Hook ---------------------------------------------------------------
     def hook(c, t):
         a1, a2 = ap(t, 0.2), ap(t, 0.7)
-        txt(c, "Sıradan bir Windows bilgisayarında", cx, 250 + (1 - a1) * 30, "semi", 52, SUB, "mt", a1)
-        txt(c, "kaç bilinen güvenlik açığı var?", cx, 320 + (1 - a2) * 30, "xbold", 88, WHITE, "mt", a2)
+        txt(c, "On an ordinary Windows PC,", cx, 250 + (1 - a1) * 30, "semi", 52, SUB, "mt", a1)
+        txt(c, "how many known vulnerabilities?", cx, 320 + (1 - a2) * 30, "xbold", 88, WHITE, "mt", a2)
         p = ease_out((t - 1.7) / 1.9)
         if t > 1.7:
             n = int(round(525 * p))
@@ -566,24 +570,24 @@ def yt_scenes(W=1920, H=1080):
             put(c, glow_sprite(360, RED, 70), cx, 650, "mm", alpha=p)
             txt(c, str(n), cx, 650, "black", 300, RED, "mm", 1.0, pulse)
         a3 = ap(t, 3.9)
-        rich(c, [("bilinen CVE  ·  ", SUB, "semi"), ("14 uygulamada", PEACH, "semi"),
-                 ("  ·  tek taramada", SUB, "semi")], cx, 850 + (1 - a3) * 20, 46, "mt", a3)
+        rich(c, [("known CVEs  ·  ", SUB, "semi"), ("in 14 apps", PEACH, "semi"),
+                 ("  ·  one scan", SUB, "semi")], cx, 850 + (1 - a3) * 20, 46, "mt", a3)
 
-    scenes.append(Scene(5.8, hook, [(1.7, "riser"), (3.6, "pop")], "hook", "Giriş"))
+    scenes.append(Scene(5.8, hook, [(1.7, "riser"), (3.6, "pop")], "hook", "Intro"))
 
     # 2 — Problem --------------------------------------------------------------
-    apps = [("Google Chrome", "148.0.7778.217", "KRIT", "1 kritik · 1 yüksek · 6 orta"),
-            ("AnyDesk", "9.6.1", "KRIT", "3 kritik · 6 yüksek · 1 orta"),
-            ("Microsoft OneDrive", "26.084.0504", "KRIT", "1 kritik · 6 yüksek · 2 orta"),
-            ("Node.js", "22.17.0", "KRIT", "1 kritik · 3 yüksek · 1 orta"),
-            ("Adobe Acrobat Reader", "20.012.20043", "YÜKS", "247 yüksek · 135 orta"),
-            ("Office 2019", "16.0.20026", "YÜKS", "14 yüksek · 2 orta"),
-            ("VS Code", "1.123.0", "YÜKS", "12 yüksek · 2 orta"),
-            ("Docker Desktop", "4.42.1", "YÜKS", "1 yüksek")]
+    apps = [("Google Chrome", "148.0.7778.217", "CRIT", "1 critical · 1 high · 6 med"),
+            ("AnyDesk", "9.6.1", "CRIT", "3 critical · 6 high · 1 med"),
+            ("Microsoft OneDrive", "26.084.0504", "CRIT", "1 critical · 6 high · 2 med"),
+            ("Node.js", "22.17.0", "CRIT", "1 critical · 3 high · 1 med"),
+            ("Adobe Acrobat Reader", "20.012.20043", "HIGH", "247 high · 135 medium"),
+            ("Office 2019", "16.0.20026", "HIGH", "14 high · 2 medium"),
+            ("VS Code", "1.123.0", "HIGH", "12 high · 2 medium"),
+            ("Docker Desktop", "4.42.1", "HIGH", "1 high")]
 
     def problem(c, t):
         a = ap(t, 0.1)
-        rich(c, [("Eski sürüm ", WHITE), ("=", OVER0), (" bilinen açık", RED)],
+        rich(c, [("Old version ", WHITE), ("=", OVER0), (" known holes", RED)],
              cx, 110 + (1 - a) * -20, 76, "mt", a, "xbold")
         cw_, ch_, gap = 400, 180, 30
         x0 = (W - (4 * cw_ + 3 * gap)) / 2
@@ -598,11 +602,11 @@ def yt_scenes(W=1920, H=1080):
                          padx=12, pady=4)
             txt(c, cnt, x + 26 + pw + 14, y + 126, "med", 23, SUB, alpha=e)
         a4, a5 = ap(t, 3.7), ap(t, 4.4)
-        txt(c, "Hepsini elle takip etmek mi?", cx, 760 + (1 - a4) * 25, "bold", 58, WHITE, "mt", a4)
-        txt(c, "Kimse istemez.", cx, 845 + (1 - a5) * 25, "xbold", 58, PEACH, "mt", a5)
+        txt(c, "Track all of them by hand?", cx, 760 + (1 - a4) * 25, "bold", 58, WHITE, "mt", a4)
+        txt(c, "Nobody wants that.", cx, 845 + (1 - a5) * 25, "xbold", 58, PEACH, "mt", a5)
 
     scenes.append(Scene(7.2, problem, [(0.6 + i * 0.13, "tick") for i in range(8)], "problem",
-                        "Sorun: eski sürümler"))
+                        "The problem: outdated software"))
 
     # 3 — Intro ----------------------------------------------------------------
     def intro(c, t):
@@ -612,9 +616,9 @@ def yt_scenes(W=1920, H=1080):
         a = ap(t, 0.7)
         txt(c, "mr-ducksafe", cx, 520 + (1 - a) * 30, "monob", 124, DUCK, "mm", a)
         a2 = ap(t, 1.2)
-        txt(c, "Windows'taki kurulu yazılımlar için NVD CVE tarayıcı", cx, 640 + (1 - a2) * 20,
+        txt(c, "An NVD CVE scanner for the software installed on Windows", cx, 640 + (1 - a2) * 20,
             "med", 46, SUB, "mt", a2)
-        labels = ["Tek .exe", "Kurulum yok", "Hesap yok", "Açık kaynak · MIT"]
+        labels = ["Single .exe", "No install", "No account", "Open source · MIT"]
         widths = [tw(s, "semi", 34) + 52 for s in labels]
         x = cx - (sum(widths) + 24 * 3) / 2
         for i, s in enumerate(labels):
@@ -623,17 +627,17 @@ def yt_scenes(W=1920, H=1080):
             x += widths[i] + 24
 
     scenes.append(Scene(5.8, intro, [(0.15, "pop")] + [(1.8 + i * 0.18, "tick") for i in range(4)],
-                        "intro", "mr-ducksafe nedir?"))
+                        "intro", "What is mr-ducksafe?"))
 
     # 4 — How it works -----------------------------------------------------------
-    steps = [("🔍", "Tara", ["Windows Registry'den", "kurulu yazılımları okur"], "143 program"),
-             ("🔗", "Eşleştir", ["50 hazır eşleme ile", "uygulamayı CPE'ye bağlar"], "21 eşleşme"),
-             ("🌐", "Sorgula", ["NVD CVE API 2.0'da", "sürüm aralığına bakar"], "525 CVE"),
-             ("🧠", "Açıkla", ["Riski sade dille anlatır,", "çözüm komutunu verir"], "14 aksiyon")]
+    steps = [("🔍", "Scan", ["Reads installed software", "from the Windows Registry"], "143 apps"),
+             ("🔗", "Match", ["Maps each app to a CPE", "via 50 curated mappings"], "21 matches"),
+             ("🌐", "Query", ["Checks NVD CVE API 2.0", "against version ranges"], "525 CVEs"),
+             ("🧠", "Explain", ["Plain-language risk", "plus the fix command"], "14 actions")]
 
     def how(c, t):
         a = ap(t, 0.1)
-        txt(c, "Nasıl çalışır?", cx, 110 + (1 - a) * -20, "xbold", 76, WHITE, "mt", a)
+        txt(c, "How does it work?", cx, 110 + (1 - a) * -20, "xbold", 76, WHITE, "mt", a)
         cw_, ch_, gap = 380, 430, 60
         x0 = (W - (4 * cw_ + 3 * gap)) / 2
         d = ImageDraw.Draw(c)
@@ -658,11 +662,11 @@ def yt_scenes(W=1920, H=1080):
                     if ea >= 1:
                         d.polygon([(ax1 + 4, ay), (ax1 - 10, ay - 10), (ax1 - 10, ay + 10)], fill=DUCK)
         a2 = ap(t, 6.3)
-        rich(c, [("Tarama tamamen yerel — NVD'ye yalnızca ", SUB, "med"),
-                 ("{vendor, product, version}", TEAL, "mono"), (" gider.", SUB, "med")],
+        rich(c, [("Scanning is fully local — only ", SUB, "med"),
+                 ("{vendor, product, version}", TEAL, "mono"), (" is sent to NVD.", SUB, "med")],
              cx, 790 + (1 - a2) * 20, 36, "mt", a2)
 
-    scenes.append(Scene(9.2, how, [(0.5 + i * 1.25, "tick") for i in range(4)], "how", "Nasıl çalışır?"))
+    scenes.append(Scene(9.2, how, [(0.5 + i * 1.25, "tick") for i in range(4)], "how", "How it works"))
 
     # 5 — Terminal: scan -------------------------------------------------------------
     summary = load_capture("01-scan.txt")
@@ -670,24 +674,24 @@ def yt_scenes(W=1920, H=1080):
     sc.wait(0.3)
     sc.type("mr-ducksafe scan", cps=16, pre=0.7)
     sc.out(BANNER)
-    sc.spin("Kurulu yazılımlar taranıyor...", 1.0, done("Tarama tamamlandı — 143 program"))
-    sc.spin("Eşleştiriliyor...", 0.6, done("Eşleştirme tamamlandı — 21 eşleşme"))
-    sc.count("NVD sorgusu... {}/21", 21, 2.0, done("Tamamlandı — 525 bulgu"))
+    sc.spin("Scanning installed software...", 1.0, done("Scan complete — 143 programs"))
+    sc.spin("Matching...", 0.6, done("Matching complete — 21 matches"))
+    sc.count("Querying NVD... {}/21", 21, 2.0, done("Done — 525 findings"))
     sc.out([[S("")]])
     sc.out(summary[:21], rate=7)
     sc.out(summary[21:], rate=26)
     t_done = sc.wait(4.2) - 4.2
 
     def scan(c, t):
-        caption(c, W, t, [("Tek komut: ", WHITE, "bold"), ("mr-ducksafe scan", DUCK, "monob")])
+        caption(c, W, t, [("One command: ", WHITE, "bold"), ("mr-ducksafe scan", DUCK, "monob")])
         draw_terminal(c, (150, 140, W - 150, H - 40), sc, t, 21)
         e = ease_back(clamp((t - t_done - 0.2) / 0.55))
         if e > 0:
             x, y, w, h = W - 150 - 40 - 600, 200, 600, 230
             a = clamp(e)
             card(c, x, y, w, h, 26, (32, 26, 40), RED, a)
-            rich(c, [("525 açık", RED, "black")], x + w / 2, y + 30, 84, "mt", a)
-            rich(c, [("→  ", OVER0, "bold"), ("14 aksiyon", GREEN, "black")], x + w / 2, y + 132,
+            rich(c, [("525 CVEs", RED, "black")], x + w / 2, y + 30, 84, "mt", a)
+            rich(c, [("→  ", OVER0, "bold"), ("14 actions", GREEN, "black")], x + w / 2, y + 132,
                  60, "mt", a)
 
     scenes.append(Scene(sc.duration, scan, [(x, "click") for x in sc.clicks()]
@@ -696,35 +700,35 @@ def yt_scenes(W=1920, H=1080):
     # 6 — Plain language ------------------------------------------------------------------
     def plain(c, t):
         a = ap(t, 0.1)
-        rich(c, [("Jargon yok. ", WHITE), ("Sade dil + çözüm komutu.", GREEN)],
+        rich(c, [("No jargon. ", WHITE), ("Plain language + the fix.", GREEN)],
              cx, 110 + (1 - a) * -20, 70, "mt", a, "xbold")
         e1 = ap(t, 0.5, 0.5)
         x, y, w, h = 110, 280 + (1 - e1) * 30, 760, 520
         card(c, x, y, w, h, 24, MANTLE, SURF0, e1)
-        txt(c, "NVD kaydı", x + 40, y + 36, "semi", 30, OVER0, alpha=e1)
+        txt(c, "NVD record", x + 40, y + 36, "semi", 30, OVER0, alpha=e1)
         txt(c, "CVE-2013-6647", x + 40, y + 90, "monob", 40, SKY, alpha=e1)
         for j, ln in enumerate(["A use-after-free in", "AnimationController::",
                                 "endAnimationUpdate in Goog…"]):
             txt(c, ln, x + 40, y + 170 + j * 58, "mono", 34, OVER0, alpha=e1)
-        txt(c, "Teknik, uzun, belirsiz.", x + 40, y + 430, "semi", 32, SUB, alpha=e1)
+        txt(c, "Technical, long, vague.", x + 40, y + 430, "semi", 32, SUB, alpha=e1)
         ea = ap(t, 1.4, 0.4)
         put(c, text_sprite("→", "black", 110, DUCK), W / 2 + 0, 540, "mm", ea, 0.6 + 0.4 * ea)
         e2 = ap(t, 1.7, 0.5)
         x, y, w = W - 110 - 760, 280 + (1 - e2) * 30, 760
         card(c, x, y, w, h, 24, (26, 34, 36), GREEN, e2)
         txt(c, "mr-ducksafe", x + 40, y + 36, "semi", 30, DUCK, alpha=e2)
-        pw, _ = pill(c, "KRIT", x + 40, y + 92, 28, CRUST, RED, None, "lt", e2, "bold", 14, 4)
+        pw, _ = pill(c, "CRIT", x + 40, y + 92, 28, CRUST, RED, None, "lt", e2, "bold", 14, 4)
         txt(c, "Google Chrome", x + 56 + pw, y + 90, "bold", 38, WHITE, alpha=e2)
-        txt(c, "Acilen güncelle — aktif sömürülebilir.", x + 40, y + 170, "semi", 32, RED, alpha=e2)
-        txt(c, "Bellek hatası yoluyla uygulama", x + 40, y + 232, "med", 34, TEXT, alpha=e2)
-        txt(c, "ele geçirilebilir.", x + 40, y + 278, "med", 34, TEXT, alpha=e2)
+        txt(c, "Update immediately — actively exploitable.", x + 40, y + 170, "semi", 32, RED, alpha=e2)
+        txt(c, "The application can be hijacked", x + 40, y + 232, "med", 34, TEXT, alpha=e2)
+        txt(c, "through a memory error.", x + 40, y + 278, "med", 34, TEXT, alpha=e2)
         e3 = ap(t, 2.6, 0.5)
         put(c, panel_sprite(680, 86, 14, CRUST, SURF0), x + 40, y + 370, alpha=e3)
         rich(c, [("> ", OVER0, "monob"), ("winget upgrade --id Google.Chrome", TEAL, "monob")],
              x + 66, y + 392, 30, "lt", e3)
 
     scenes.append(Scene(7.0, plain, [(0.5, "tick"), (1.7, "tick"), (2.6, "pop")], "plain",
-                        "Sade dilde risk + çözüm"))
+                        "Plain-language risk + fix"))
 
     # 7 — Terminal: app details ---------------------------------------------------------------
     table = load_capture("02-chrome.txt")
@@ -732,31 +736,31 @@ def yt_scenes(W=1920, H=1080):
     sd.wait(0.2)
     sd.type('mr-ducksafe scan --app "Chrome" --details', cps=28, pre=0.4)
     sd.out(BANNER)
-    sd.spin("Kurulu yazılımlar taranıyor...", 0.35, done("Tarama tamamlandı — 143 program"))
-    sd.spin("Eşleştiriliyor...", 0.3, done("Eşleştirme tamamlandı — 21 eşleşme"))
-    sd.count("NVD sorgusu... {}/21", 21, 0.6, done("Tamamlandı — 525 bulgu"))
+    sd.spin("Scanning installed software...", 0.35, done("Scan complete — 143 programs"))
+    sd.spin("Matching...", 0.3, done("Matching complete — 21 matches"))
+    sd.count("Querying NVD... {}/21", 21, 0.6, done("Done — 525 findings"))
     sd.out([[S("")]])
     sd.out(table, rate=20)
     sd.wait(3.0)
 
     def details(c, t):
-        caption(c, W, t, [("Tek uygulama, tüm CVE'ler: ", WHITE, "bold"), ("--app", DUCK, "monob"),
+        caption(c, W, t, [("One app, every CVE: ", WHITE, "bold"), ("--app", DUCK, "monob"),
                           (" + ", OVER0, "bold"), ("--details", DUCK, "monob")])
         draw_terminal(c, (110, 140, W - 110, H - 40), sd, t, 17)
 
     scenes.append(Scene(sd.duration, details, [(x, "click") for x in sd.clicks()], "details",
-                        "Demo: --app ve --details"))
+                        "Demo: --app and --details"))
 
     # 8 — CI ---------------------------------------------------------------------------------
     ci = TermScript()
     ci.wait(0.2)
     ci.type("mr-ducksafe scan --fail-on=high --format=json -o report.json", cps=30, pre=0.4)
-    ci.spin("Kurulu yazılımlar taranıyor...", 0.4, done("Tarama tamamlandı — 143 program"))
-    ci.spin("Eşleştiriliyor...", 0.3, done("Eşleştirme tamamlandı — 21 eşleşme"))
-    ci.count("NVD sorgusu... {}/21", 21, 0.8, done("Tamamlandı — 525 bulgu"))
-    ci.out([[S("Rapor yazıldı: report.json", SUB)]])
+    ci.spin("Scanning installed software...", 0.4, done("Scan complete — 143 programs"))
+    ci.spin("Matching...", 0.3, done("Matching complete — 21 matches"))
+    ci.count("Querying NVD... {}/21", 21, 0.8, done("Done — 525 findings"))
+    ci.out([[S("Report written: report.json", SUB)]])
     ci.type("$LASTEXITCODE", cps=18, pre=0.4)
-    ci.out([[S("1", RED, "b")], [S("")], [S("# yüksek+ bulgu var → exit 1 → pipeline 'failed'", OVER0)]])
+    ci.out([[S("1", RED, "b")], [S("")], [S("# high+ finding → exit 1 → pipeline 'failed'", OVER0)]])
     ci.wait(3.5)
     yaml = [
         "name: cve-scan",
@@ -796,15 +800,15 @@ def yt_scenes(W=1920, H=1080):
     yaml_lines = [yaml_segs(ln) for ln in yaml]
 
     def cistep(c, t):
-        caption(c, W, t, [("CI/CD için: ", WHITE, "bold"), ("--fail-on", DUCK, "monob"),
-                          (" + JSON rapor", WHITE, "bold")])
+        caption(c, W, t, [("Built for CI/CD: ", WHITE, "bold"), ("--fail-on", DUCK, "monob"),
+                          (" + JSON report", WHITE, "bold")])
         draw_terminal(c, (90, 150, 920, 720), ci, t, 18)
         e = ap(t, 0.8, 0.6)
         n = int(clamp((t - 0.8) * 9, 0, len(yaml_lines)))
         draw_terminal(c, (950, 150 + (1 - e) * 30, W - 90, 720 + (1 - e) * 30), None, t, 16,
                       ".github/workflows/cve-scan.yml", yaml_lines[:n], alpha=e)
-        codes = [("0", GREEN, "Temiz", "eşik aşılmadı"), ("1", RED, "Eşik aşıldı", "--fail-on tetiklendi"),
-                 ("2", PEACH, "Tarama hatası", "NVD'ye ulaşılamadı vb.")]
+        codes = [("0", GREEN, "Clean", "threshold not crossed"), ("1", RED, "Threshold hit", "--fail-on triggered"),
+                 ("2", PEACH, "Scan error", "e.g. NVD unreachable")]
         cw_ = (W - 180 - 2 * 30) / 3
         for i, (code, col, title, desc) in enumerate(codes):
             ea = ap(t, 2.0 + i * 0.25)
@@ -817,7 +821,7 @@ def yt_scenes(W=1920, H=1080):
 
     scenes.append(Scene(ci.duration, cistep, [(x, "click") for x in ci.clicks()]
                         + [(2.0 + i * 0.25, "tick") for i in range(3)], "ci",
-                        "CI/CD: --fail-on ve JSON"))
+                        "CI/CD: --fail-on and JSON"))
 
     # 9 — History + privacy ----------------------------------------------------------------------
     hist = load_capture("03-history.txt")
@@ -828,18 +832,18 @@ def yt_scenes(W=1920, H=1080):
     hs.wait(0.5)
     hs.type("mr-ducksafe prune --older-than=30d", cps=24, pre=0.6)
     hs.wait(4.0)
-    privacy = ["Tarama tamamen yerel", "NVD'ye yalnızca {vendor, product, version}",
-               "Makine adı, kullanıcı, IP gönderilmez", "Telemetri yok",
-               "Geçmiş yerel SQLite'ta: ~/.mr-ducksafe"]
+    privacy = ["Scanning is fully local", "NVD only sees {vendor, product, version}",
+               "No machine name, user or IP sent", "Zero telemetry",
+               "History in local SQLite: ~/.mr-ducksafe"]
 
     def histpriv(c, t):
-        caption(c, W, t, [("Yerel geçmiş ", WHITE, "bold"), ("·", OVER0, "bold"),
-                          (" önce gizlilik", GREEN, "bold")])
+        caption(c, W, t, [("Local history ", WHITE, "bold"), ("·", OVER0, "bold"),
+                          (" privacy first", GREEN, "bold")])
         draw_terminal(c, (90, 160, 960, 620), hs, t, 21)
         x = 1040
         a = ap(t, 0.6)
         put(c, emoji_sprite("🔒", 60), x, 200, "lt", a)
-        txt(c, "Gizlilik", x + 80, 196, "xbold", 60, WHITE, alpha=a)
+        txt(c, "Privacy", x + 80, 196, "xbold", 60, WHITE, alpha=a)
         for i, s in enumerate(privacy):
             e = ap(t, 1.0 + i * 0.35)
             y = 320 + i * 92 + (1 - e) * 20
@@ -848,16 +852,16 @@ def yt_scenes(W=1920, H=1080):
             txt(c, s, x + 68, y + 2, "semi", 34, TEXT, alpha=e)
         e = ap(t, 2.0)
         card(c, 90, 680 + (1 - e) * 20, 870, 300, 22, MANTLE, SURF0, e)
-        txt(c, "Her tarama SQLite'a kaydedilir:", 130, 715 + (1 - e) * 20, "semi", 32, WHITE, alpha=e)
-        for j, (cmd, desc) in enumerate((("history", "geçmiş taramalar"),
-                                         ("prune --older-than=30d", "eski kayıtları sil"),
-                                         ("--db PATH", "farklı DB yolu"))):
+        txt(c, "Every scan is saved to SQLite:", 130, 715 + (1 - e) * 20, "semi", 32, WHITE, alpha=e)
+        for j, (cmd, desc) in enumerate((("history", "past scans"),
+                                         ("prune --older-than=30d", "delete old records"),
+                                         ("--db PATH", "custom DB location"))):
             yy = 785 + j * 60 + (1 - e) * 20
             txt(c, cmd, 130, yy, "monob", 28, DUCK, alpha=e)
             txt(c, "— " + desc, 130 + tw(cmd, "monob", 28) + 16, yy + 2, "med", 28, SUB, alpha=e)
 
     scenes.append(Scene(hs.duration, histpriv, [(x, "click") for x in hs.clicks()], "history",
-                        "Geçmiş ve gizlilik"))
+                        "History and privacy"))
 
     # 10 — Outro --------------------------------------------------------------------------------------
     def outro(c, t):
@@ -867,12 +871,12 @@ def yt_scenes(W=1920, H=1080):
         a = ap(t, 0.4)
         txt(c, "mr-ducksafe", cx, 340 + (1 - a) * 20, "monob", 104, DUCK, "mm", a)
         a = ap(t, 0.8)
-        txt(c, "Bilinen açıkları bulmak ve kapatmak hiç bu kadar basit olmamıştı.", cx,
+        txt(c, "Finding and fixing known vulnerabilities has never been this simple.", cx,
             420 + (1 - a) * 20, "med", 40, SUB, "mt", a)
         e2 = ap(t, 1.3)
         x, y, w, h = 300, 520 + (1 - e2) * 30, W - 600, 270
         card(c, x, y, w, h, 22, CRUST, SURF0, e2)
-        rows = [[("# Windows: GitHub Releases → mr-ducksafe.exe indir", OVER0, "mono")],
+        rows = [[("# Windows: download mr-ducksafe.exe from GitHub Releases", OVER0, "mono")],
                 [("go install ", TEXT, "mono"),
                  ("github.com/yemresalcan/mr-ducksafe/cmd/mr-ducksafe@latest", TEAL, "mono")],
                 [("mr-ducksafe scan", DUCK, "monob")]]
@@ -882,12 +886,12 @@ def yt_scenes(W=1920, H=1080):
         pill(c, "github.com/yemresalcan/mr-ducksafe", cx, 850 + (1 - e3) * 20, 48, CRUST, DUCK,
              None, "mt", e3, "xbold")
         e4 = ap(t, 2.8)
-        s4 = "Yıldız verin  ·  Yeni mapping PR'larına açık  ·  MIT"
+        s4 = "Star it  ·  New mapping PRs welcome  ·  MIT"
         w4 = tw(s4, "semi", 36) + 60
         put(c, emoji_sprite("⭐", 44), cx - w4 / 2, 985, "lm", e4)
         txt(c, s4, cx - w4 / 2 + 60, 985, "semi", 36, TEXT, "lm", e4)
 
-    scenes.append(Scene(8.5, outro, [(0.1, "pop"), (2.2, "tick")], "outro", "Kurulum ve bağlantılar"))
+    scenes.append(Scene(8.5, outro, [(0.1, "pop"), (2.2, "tick")], "outro", "Install and links"))
     return scenes
 
 
@@ -898,16 +902,16 @@ def short_scenes(W=1080, H=1920):
 
     def hook(c, t):
         a1, a2 = ap(t, 0.15), ap(t, 0.5)
-        txt(c, "Bilgisayarında", cx, 430 + (1 - a1) * 30, "bold", 72, SUB, "mt", a1)
-        txt(c, "kaç güvenlik", cx, 530 + (1 - a2) * 30, "black", 104, WHITE, "mt", a2)
-        txt(c, "açığı var?", cx, 650 + (1 - a2) * 30, "black", 104, WHITE, "mt", a2)
+        txt(c, "How many", cx, 430 + (1 - a1) * 30, "bold", 72, SUB, "mt", a1)
+        txt(c, "security holes", cx, 530 + (1 - a2) * 30, "black", 104, WHITE, "mt", a2)
+        txt(c, "are on your PC?", cx, 650 + (1 - a2) * 30, "black", 104, WHITE, "mt", a2)
         p = ease_out((t - 1.3) / 1.7)
         if t > 1.3:
             pulse = 1 + 0.08 * math.sin(clamp((t - 3.0) / 0.35) * math.pi)
             put(c, glow_sprite(320, RED, 70), cx, 1000, "mm", alpha=p)
             txt(c, str(int(round(525 * p))), cx, 1000, "black", 300, RED, "mm", 1, pulse)
         a3 = ap(t, 3.2)
-        txt(c, "bilinen CVE · tek taramada", cx, 1190 + (1 - a3) * 20, "semi", 50, PEACH, "mt", a3)
+        txt(c, "known CVEs · one scan", cx, 1190 + (1 - a3) * 20, "semi", 50, PEACH, "mt", a3)
 
     scenes.append(Scene(4.8, hook, [(1.3, "riser"), (3.0, "pop")], "hook"))
 
@@ -916,9 +920,9 @@ def short_scenes(W=1080, H=1920):
     sc.wait(0.2)
     sc.type("mr-ducksafe scan", cps=18, pre=0.4)
     sc.out(BANNER)
-    sc.spin("Kurulu yazılımlar taranıyor...", 0.6, done("Tarama tamamlandı — 143 program"))
-    sc.spin("Eşleştiriliyor...", 0.4, done("Eşleştirme tamamlandı — 21 eşleşme"))
-    sc.count("NVD sorgusu... {}/21", 21, 1.2, done("Tamamlandı — 525 bulgu"))
+    sc.spin("Scanning installed software...", 0.6, done("Scan complete — 143 programs"))
+    sc.spin("Matching...", 0.4, done("Matching complete — 21 matches"))
+    sc.count("Querying NVD... {}/21", 21, 1.2, done("Done — 525 findings"))
     sc.out([[S("")]])
     sc.out(summary[:27], rate=10)
     sc.out(summary[27:], rate=30)
@@ -926,15 +930,15 @@ def short_scenes(W=1080, H=1920):
 
     def scan(c, t):
         a = ap(t, 0.1)
-        txt(c, "Tek komut:", cx, 190 + (1 - a) * -20, "bold", 56, WHITE, "mt", a)
+        txt(c, "One command:", cx, 190 + (1 - a) * -20, "bold", 56, WHITE, "mt", a)
         pill(c, "mr-ducksafe scan", cx, 272 + (1 - a) * -20, 50, CRUST, DUCK, None, "mt", a, "monob")
         draw_terminal(c, (20, 400, W - 20, 1560), sc, t, 17)
         e = ease_back(clamp((t - t_done - 0.2) / 0.55))
         if e > 0:
             x, y, w, h = 90, 1180, W - 180, 300
             card(c, x, y, w, h, 28, (32, 26, 40), RED, clamp(e))
-            txt(c, "525 açık", cx, y + 40, "black", 110, RED, "mt", clamp(e))
-            rich(c, [("→  ", OVER0, "bold"), ("14 aksiyon", GREEN, "black")], cx, y + 180, 72,
+            txt(c, "525 CVEs", cx, y + 40, "black", 110, RED, "mt", clamp(e))
+            rich(c, [("→  ", OVER0, "bold"), ("14 actions", GREEN, "black")], cx, y + 180, 72,
                  "mt", clamp(e))
 
     scenes.append(Scene(sc.duration, scan, [(x, "click") for x in sc.clicks()] + [(t_done + 0.2, "pop")],
@@ -942,12 +946,12 @@ def short_scenes(W=1080, H=1920):
 
     def plain(c, t):
         a = ap(t, 0.1)
-        txt(c, "Jargon yok.", cx, 300 + (1 - a) * -20, "black", 96, WHITE, "mt", a)
-        txt(c, "Sade dil + çözüm.", cx, 410 + (1 - a) * -20, "black", 76, GREEN, "mt", a)
+        txt(c, "No jargon.", cx, 300 + (1 - a) * -20, "black", 96, WHITE, "mt", a)
+        txt(c, "Plain words + the fix.", cx, 410 + (1 - a) * -20, "black", 76, GREEN, "mt", a)
         e1 = ap(t, 0.4)
         x, y, w = 70, 560 + (1 - e1) * 30, W - 140
         card(c, x, y, w, 300, 24, MANTLE, SURF0, e1)
-        txt(c, "NVD kaydı · CVE-2013-6647", x + 40, y + 34, "semi", 32, OVER0, alpha=e1)
+        txt(c, "NVD record · CVE-2013-6647", x + 40, y + 34, "semi", 32, OVER0, alpha=e1)
         for j, ln in enumerate(["A use-after-free in", "AnimationController::endAnim…"]):
             txt(c, ln, x + 40, y + 110 + j * 60, "mono", 36, OVER0, alpha=e1)
         ea = ap(t, 1.0)
@@ -955,23 +959,23 @@ def short_scenes(W=1080, H=1920):
         e2 = ap(t, 1.3)
         y = 1010 + (1 - e2) * 30
         card(c, x, y, w, 470, 24, (26, 34, 36), GREEN, e2)
-        pw, _ = pill(c, "KRIT", x + 40, y + 40, 32, CRUST, RED, None, "lt", e2, "bold", 14, 4)
+        pw, _ = pill(c, "CRIT", x + 40, y + 40, 32, CRUST, RED, None, "lt", e2, "bold", 14, 4)
         txt(c, "Google Chrome", x + 58 + pw, y + 36, "bold", 44, WHITE, alpha=e2)
-        txt(c, "Bellek hatası yoluyla", x + 40, y + 130, "semi", 46, TEXT, alpha=e2)
-        txt(c, "uygulama ele geçirilebilir.", x + 40, y + 190, "semi", 46, TEXT, alpha=e2)
+        txt(c, "The app can be hijacked", x + 40, y + 130, "semi", 46, TEXT, alpha=e2)
+        txt(c, "through a memory error.", x + 40, y + 190, "semi", 46, TEXT, alpha=e2)
         e3 = ap(t, 2.2)
         put(c, panel_sprite(w - 80, 110, 16, CRUST, SURF0), x + 40, y + 300, alpha=e3)
         txt(c, "winget upgrade --id Google.Chrome", x + 70, y + 333, "monob", 34, TEAL, alpha=e3)
 
     scenes.append(Scene(5.6, plain, [(0.4, "tick"), (1.3, "tick"), (2.2, "pop")], "plain"))
 
-    feats = [("📦", "Tek .exe — kurulum yok"), ("🏛", "Resmi NVD CVE verisi"),
-             ("🧠", "Riskler sade dilde"), ("🛠", "winget ile tek komut çözüm"),
-             ("⚙", "CI için --fail-on"), ("🔒", "%100 yerel, telemetri yok")]
+    feats = [("📦", "Single .exe — no install"), ("🏛", "Official NVD CVE data"),
+             ("🧠", "Risks in plain language"), ("🛠", "One-command fix via winget"),
+             ("⚙", "--fail-on for CI"), ("🔒", "100% local, zero telemetry")]
 
     def features(c, t):
         a = ap(t, 0.1)
-        txt(c, "Neden", cx, 300 + (1 - a) * -20, "bold", 64, SUB, "mt", a)
+        txt(c, "Why", cx, 300 + (1 - a) * -20, "bold", 64, SUB, "mt", a)
         txt(c, "mr-ducksafe?", cx, 380 + (1 - a) * -20, "monob", 96, DUCK, "mt", a)
         for i, (em, s) in enumerate(feats):
             e = ap(t, 0.5 + i * 0.32)
@@ -989,12 +993,12 @@ def short_scenes(W=1080, H=1920):
         a = ap(t, 0.5)
         txt(c, "mr-ducksafe", cx, 820 + (1 - a) * 20, "monob", 112, DUCK, "mm", a)
         a = ap(t, 0.9)
-        txt(c, "Ücretsiz · Açık kaynak · MIT", cx, 920 + (1 - a) * 20, "semi", 50, TEXT, "mt", a)
+        txt(c, "Free · Open source · MIT", cx, 920 + (1 - a) * 20, "semi", 50, TEXT, "mt", a)
         a = ap(t, 1.4)
         pill(c, "github.com/yemresalcan/mr-ducksafe", cx, 1040 + (1 - a) * 20, 44, CRUST, DUCK,
              None, "mt", a, "xbold", padx=34, pady=18)
         a = ap(t, 2.0)
-        s5 = "Yıldızla · kaydet · paylaş"
+        s5 = "Star · save · share"
         w5 = tw(s5, "bold", 52) + 72
         put(c, emoji_sprite("⭐", 52), cx - w5 / 2, 1220, "lm", a)
         txt(c, s5, cx - w5 / 2 + 72, 1220, "bold", 52, WHITE, "lm", a)
@@ -1158,56 +1162,57 @@ def write_wav(path, scenes, total):
 
 
 # --------------------------------------------------------------------------
-# Voice-over (Turkish narration)
+# Voice-over (English narration)
 # --------------------------------------------------------------------------
-# Texts are written the way they should be *pronounced* (e.g. "mister dakseyf"
-# for mr-ducksafe) because Turkish TTS voices read English words letter by letter.
+# Texts are written the way they should be *pronounced* (e.g. "Mister Ducksafe"
+# for mr-ducksafe, "win-get" for winget).
 # (earliest start within the scene, text). A line starts at that time or right
 # after the previous line, whichever is later; a scene is lengthened
 # automatically when its narration needs more time.
 VO = {
     "youtube": {
-        "hook": [(0.3, "Sıradan bir Windows bilgisayarında, kaç bilinen güvenlik açığı var?"),
-                 (3.2, "Bu makinede tam beş yüz yirmi beş.")],
-        "problem": [(0.3, "Chrome, AnyDesk, Office, Adobe Rîdır... Eski sürümde kalan her uygulama, "
-                          "herkesin bildiği açıklar demek."),
-                    (0.0, "Peki bunların hepsini elle takip etmek? Kimse istemez.")],
-        "intro": [(0.2, "İşte mister dakseyf. Windows'taki kurulu yazılımlar için ücretsiz ve "
-                        "açık kaynak bir güvenlik açığı tarayıcısı."),
-                  (0.0, "Tek bir dosya. Kurulum yok, hesap yok.")],
-        "how": [(0.4, "Önce Windows kayıt defterinden kurulu programları okur."),
-                (0.0, "Sonra her birini, resmi bir ürün kimliğiyle eşleştirir."),
-                (0.0, "Ardından, Amerikan ulusal açık veritabanında, kurulu sürümü etkileyen açıkları sorgular."),
-                (0.0, "Son olarak riski sade bir dille anlatır, ve çözüm komutunu verir.")],
-        "scan": [(0.4, "Tek komut yeterli."),
-                 (3.4, "Yüz kırk üç program tarandı, yirmi bir tanesi eşleşti."),
-                 (6.8, "Sonuç: beş yüz yirmi beş açık. Ama karşınızda, en kritikten başlayarak, "
-                       "sadece on dört net aksiyon var.")],
-        "plain": [(0.3, "Veritabanındaki kayıt teknik ve uzun."),
-                  (0.0, "mister dakseyf ise ne anlama geldiğini söyler: bellek hatası yoluyla, "
-                        "uygulama ele geçirilebilir."),
-                  (0.0, "Ve çözümü verir: tek bir güncelleme komutu.")],
-        "details": [(0.4, "Tek bir uygulamanın tüm açıklarını görmek isterseniz, uygulama adını "
-                          "verin ve ayrıntılı tabloyu açın.")],
-        "ci": [(0.4, "Sürekli entegrasyon için de hazır."),
-               (0.0, "Belirlediğiniz eşik aşılırsa çıkış kodu bir olur, ve iş akışı kırmızıya döner."),
-               (0.0, "Rapor da makinenin okuyabileceği bir dosya olarak kaydedilir.")],
-        "history": [(0.4, "Her tarama, bilgisayarınızdaki yerel bir veritabanına yazılır."),
-                    (0.0, "Tarama tamamen yerelde çalışır. Dışarıya yalnızca üretici, ürün ve sürüm "
-                          "bilgisi gider. Telemetri yok.")],
-        "outro": [(0.4, "mister dakseyf'i GitHub'dan indirin, tek komutla taramaya başlayın."),
-                  (0.0, "Beğendiyseniz, projeye bir yıldız vermeyi unutmayın.")],
+        "hook": [(0.3, "How many known security vulnerabilities are sitting on an ordinary Windows PC?"),
+                 (3.2, "On this one: five hundred and twenty-five.")],
+        "problem": [(0.3, "Chrome, AnyDesk, OneDrive, Adobe Reader. Every app stuck on an old version "
+                          "carries vulnerabilities the whole world already knows about."),
+                    (0.0, "Tracking all of them by hand? Nobody wants that.")],
+        "intro": [(0.2, "Meet Mister Ducksafe: a free, open-source vulnerability scanner for the "
+                        "software installed on Windows."),
+                  (0.0, "One single exe. No install, no account.")],
+        "how": [(0.4, "First, it reads your installed programs from the Windows Registry."),
+                (0.0, "Then it maps each one to an official product identifier, called a CPE."),
+                (0.0, "Next, it queries the National Vulnerability Database for issues that affect "
+                      "the exact version you have."),
+                (0.0, "Finally, it explains the risk in plain language, and hands you the fix.")],
+        "scan": [(0.4, "All it takes is one command."),
+                 (3.4, "A hundred and forty-three programs scanned. Twenty-one matched."),
+                 (6.8, "The result: five hundred and twenty-five vulnerabilities, boiled down to "
+                       "just fourteen clear actions, most critical first.")],
+        "plain": [(0.3, "The raw database entry is technical and long."),
+                  (0.0, "Mister Ducksafe tells you what it actually means: the application can be "
+                        "hijacked through a memory error."),
+                  (0.0, "And it gives you the fix: a single win-get command.")],
+        "details": [(0.4, "Want every CVE for a single app? Filter by name, and switch on the "
+                          "detailed table.")],
+        "ci": [(0.4, "It is built for CI, too."),
+               (0.0, "If findings cross your fail-on threshold, it exits with code one, and the "
+                     "pipeline turns red."),
+               (0.0, "The full report is saved as JSON.")],
+        "history": [(0.4, "Every scan is stored in a local database on your machine."),
+                    (0.0, "Scanning is fully local. Only vendor, product and version ever leave "
+                          "your computer. Zero telemetry.")],
+        "outro": [(0.4, "Grab Mister Ducksafe on GitHub, and start scanning with one command."),
+                  (0.0, "If you find it useful, give the project a star.")],
     },
     "short": {
-        "hook": [(0.2, "Bilgisayarında kaç güvenlik açığı var?"),
-                 (0.2, "Bu makinede, beş yüz yirmi beş.")],
-        "scan": [(0.3, "Tek komut: mister dakseyf sken."),
-                 (2.6, "Yüz kırk üç program tarandı."),
-                 (0.3, "Beş yüz yirmi beş açık. Ama sadece on dört aksiyon.")],
-        "plain": [(0.2, "Jargon yok. Riski sade dille söyler, çözüm komutunu da verir.")],
-        "features": [(0.3, "Tek dosya, resmi veritabanı, sürekli entegrasyon desteği, "
-                           "ve yüzde yüz yerel.")],
-        "cta": [(0.3, "Ücretsiz ve açık kaynak. Link açıklamada.")],
+        "hook": [(0.2, "How many security holes are on your PC?"),
+                 (0.2, "On this one? Five hundred and twenty-five.")],
+        "scan": [(0.3, "One command: Mister Ducksafe scan."),
+                 (2.6, "A hundred and forty-three programs scanned."),
+                 (0.3, "Five hundred and twenty-five vulnerabilities. But only fourteen actions.")],
+        "plain": [(0.2, "No jargon. It tells you the risk in plain words, and gives you the fix.")],
+        "features": [(0.3, "A single exe, official N V D data, CI support, and one hundred percent local.")],
+        "cta": [(0.3, "Free and open source. Link in the description.")],
     },
 }
 
@@ -1216,10 +1221,39 @@ TTS_CACHE = Path(tempfile.gettempdir()) / "ducksafe-tts"
 
 def _tts_engine():
     """DUCKSAFE_TTS selects the voice:
-         piper:/path/to/tr_TR-xxx.onnx   neural Piper voice (best quality)
-         espeak:mb-tr2 | espeak:tr        espeak-ng (+ MBROLA) fallback
-       Default: espeak:tr."""
-    return os.environ.get("DUCKSAFE_TTS", "espeak:tr")
+         kokoro:<voice>                  Kokoro-82M (Apache-2.0), default kokoro:af_heart.
+                                         KOKORO_MODEL=<model.onnx>, KOKORO_VOICES=<voice .bin,
+                                         folder of .bin files, or kokoro-onnx .npz>
+         piper:/path/to/voice.onnx       Piper neural voice
+         espeak:<voice>                  espeak-ng fallback
+         off                             no narration"""
+    return os.environ.get("DUCKSAFE_TTS", "kokoro:af_heart")
+
+
+_KOKORO = {}
+
+
+def _kokoro_say(text, voice, path):
+    from kokoro_onnx import Kokoro
+    if "k" not in _KOKORO:
+        kdir = Path(tempfile.gettempdir()) / "kokoro"
+        voices = Path(os.environ.get("KOKORO_VOICES", str(kdir / "voices.npz")))
+        if voices.suffix == ".bin" or voices.is_dir():
+            # raw per-voice .bin files (onnx-community layout) → .npz expected by kokoro-onnx
+            bins = sorted(voices.glob("*.bin")) if voices.is_dir() else [voices]
+            npz = Path(tempfile.gettempdir()) / "ducksafe-kokoro-voices.npz"
+            np.savez(npz, **{b.stem: np.fromfile(b, dtype=np.float32).reshape(-1, 1, 256)
+                             for b in bins})
+            voices = npz
+        _KOKORO["k"] = Kokoro(os.environ.get("KOKORO_MODEL", str(kdir / "model.onnx")),
+                              str(voices))
+    a, sr = _KOKORO["k"].create(text, voice=voice, speed=1.0,
+                                lang="en-gb" if voice.startswith("b") else "en-us")
+    with wave.open(str(path), "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(sr)
+        w.writeframes((np.clip(a, -1, 1) * 32000).astype(np.int16).tobytes())
 
 
 def tts(text: str) -> np.ndarray:
@@ -1231,7 +1265,9 @@ def tts(text: str) -> np.ndarray:
     if not out.exists():
         raw = TTS_CACHE / f"{key}.raw.wav"
         kind, _, arg = eng.partition(":")
-        if kind == "piper":
+        if kind == "kokoro":
+            _kokoro_say(text, arg or "af_heart", raw)
+        elif kind == "piper":
             subprocess.run([sys.executable, "-m", "piper", "-m", arg, "-f", str(raw),
                             "--length-scale", "1.05", "--sentence-silence", "0.25", "--", text],
                            check=True, capture_output=True)
@@ -1244,8 +1280,7 @@ def tts(text: str) -> np.ndarray:
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-ac", "1",
                         "-ar", str(SR), "-af",
                         "highpass=f=80,lowpass=f=9500,"
-                        "acompressor=threshold=-20dB:ratio=3:attack=5:release=120,"
-                        "aecho=0.8:0.5:28:0.08",
+                        "acompressor=threshold=-20dB:ratio=3:attack=5:release=120",
                         str(out)], check=True)
         raw.unlink(missing_ok=True)
     with wave.open(str(out), "rb") as w:
@@ -1361,7 +1396,7 @@ def render_thumbnail():
 
     # tilted terminal on the right
     term = Image.new("RGB", (720, 470), BASE)
-    lines = [colorize(l) for l in (DEMO / "01-scan.txt").read_text(encoding="utf-8-sig").splitlines()[:21]]
+    lines = load_capture("01-scan.txt")[:21]
     tmp_bg = Image.new("RGB", (760, 510), BASE)
     draw_terminal(tmp_bg, (20, 20, 740, 490), None, 0, 15, "mr-ducksafe scan", lines)
     term = tmp_bg.convert("RGBA").rotate(-7, resample=Image.BICUBIC, expand=True,
@@ -1377,14 +1412,14 @@ def render_thumbnail():
     put(img, emoji_sprite("🦆", 330), 1085, 520, "mm")
 
     stroke = 7
-    pill(img, "WINDOWS · ÜCRETSİZ CVE TARAYICI", 56, 48, 30, CRUST, DUCK, None, "lt", 1, "xbold",
+    pill(img, "WINDOWS · FREE CVE SCANNER", 56, 48, 30, CRUST, DUCK, None, "lt", 1, "xbold",
          padx=22, pady=10)
     x = 50
     w1 = tw("525 ", "black", 196)
     txt(img, "525", x, 100, "black", 196, RED, stroke=stroke)
-    txt(img, "AÇIK", x + w1 - 8, 100, "black", 196, WHITE, stroke=stroke)
-    txt(img, "→ 14 AKSİYON", x + 4, 335, "black", 110, GREEN, stroke=stroke)
-    txt(img, "tek komutla, sade dilde", x + 8, 480, "bold", 54, WHITE, stroke=5)
+    txt(img, "CVEs", x + w1 - 8, 100, "black", 196, WHITE, stroke=stroke)
+    txt(img, "→ 14 ACTIONS", x + 4, 335, "black", 110, GREEN, stroke=stroke)
+    txt(img, "one command, plain English", x + 8, 480, "bold", 54, WHITE, stroke=5)
     pill(img, "> mr-ducksafe scan", 58, 590, 40, DUCK, CRUST, SURF1, "lt", 1, "monob",
          padx=24, pady=12)
     OUT.mkdir(parents=True, exist_ok=True)

@@ -1,0 +1,6 @@
+ID  Date                 Status   Time  Findings
+14  2026-06-04 22:56:19  success  15s   525
+13  2026-06-04 22:30:40  success  17s   525
+12  2026-06-01 00:31:15  success  14s   521
+11  2026-06-01 00:26:45  running  -     0
+10  2026-05-29 16:35:11  success  14s   521

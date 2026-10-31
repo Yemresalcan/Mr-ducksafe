@@ -26,13 +26,15 @@
 
 ## 🎬 Tanıtım Videosu
 
-<!-- YouTube'a yükledikten sonra aşağıdaki iki linki video URL'leriyle değiştir. -->
-<a href="docs/media/mr-ducksafe-youtube.mp4"><img src="docs/media/thumbnail.png" alt="mr-ducksafe tanıtım videosu — 525 açık → 14 aksiyon" width="720"></a>
+<!-- YouTube'a yükledikten sonra aşağıdaki linkleri video URL'leriyle değiştir. -->
+<a href="docs/media/mr-ducksafe-youtube.mp4"><img src="docs/media/thumbnail.png" alt="mr-ducksafe tanıtım videosu — 525 CVE → 14 aksiyon" width="720"></a>
 
-- ▶️ **YouTube (1:26):** [docs/media/mr-ducksafe-youtube.mp4](docs/media/mr-ducksafe-youtube.mp4) — sorun, nasıl çalışır, canlı demo, CI kullanımı, gizlilik
-- 📱 **Shorts (0:35, dikey):** [docs/media/mr-ducksafe-short.mp4](docs/media/mr-ducksafe-short.mp4)
+- ▶️ **YouTube (1:58):** [docs/media/mr-ducksafe-youtube.mp4](docs/media/mr-ducksafe-youtube.mp4) — sorun, nasıl çalışır, canlı demo, CI kullanımı, gizlilik
+- 📱 **Shorts (0:37, dikey):** [docs/media/mr-ducksafe-short.mp4](docs/media/mr-ducksafe-short.mp4)
 
-Videolar ve thumbnail, gerçek tarama çıktılarından (`scripts/demo/*.txt`) kodla üretilir — bkz. [Tanıtım materyallerini yeniden üretmek](#tanıtım-materyallerini-yeniden-üretmek).
+Videolar İngilizce seslendirmeli ve İngilizce ekran yazılıdır (terminal sahneleri `README.en.md`'deki gibi İngilizceye çevrilmiş çıktıyı gösterir). Hepsi kodla üretilir — bkz. [Tanıtım materyallerini yeniden üretmek](#tanıtım-materyallerini-yeniden-üretmek).
+
+---
 
 ## Neden?
 
@@ -425,7 +427,7 @@ python scripts/video/render_video.py thumbnail    # sadece thumbnail
 python scripts/video/render_video.py preview short  # birkaç kare önizleme
 ```
 
-Terminal sahneleri `scripts/demo/*.txt` içindeki gerçek çıktılardan beslenir; müzik ve efektler numpy ile sentezlenir (telif riski yok). YouTube başlık/açıklama/bölüm metinleri: [docs/media/YOUTUBE.md](docs/media/YOUTUBE.md).
+Terminal sahneleri gerçek tarama çıktılarının (`scripts/demo/*.txt`) İngilizce karşılıklarından (`scripts/demo/en/`) beslenir; müzik ve efektler numpy ile sentezlenir (telif riski yok). Seslendirme yerel çalışan [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) (Apache-2.0) ile yapılır: `pip install kokoro-onnx`, ardından [onnx-community/Kokoro-82M-v1.0-ONNX](https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX)'ten `onnx/model.onnx` ve `voices/af_heart.bin` dosyalarını indirip `KOKORO_MODEL` / `KOKORO_VOICES` ile göster (ayrıntı script'in başında). Seslendirmesiz üretmek için `DUCKSAFE_TTS=off`. YouTube başlık/açıklama/bölüm metinleri: [docs/media/YOUTUBE.md](docs/media/YOUTUBE.md).
 
 **Dokümanlar:**
 - Tasarım: [docs/superpowers/specs/2026-05-23-mr-ducksafe-design.md](docs/superpowers/specs/2026-05-23-mr-ducksafe-design.md)

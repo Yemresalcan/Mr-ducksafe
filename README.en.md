@@ -26,13 +26,15 @@ Not 500+ CVEs → ~10 action items. Risk in plain language, fix in one command.
 
 ## 🎬 Promo Video
 
-<!-- After uploading to YouTube, replace the two links below with the video URLs. -->
-<a href="docs/media/mr-ducksafe-youtube.mp4"><img src="docs/media/thumbnail.png" alt="mr-ducksafe promo video — 525 vulnerabilities → 14 action items" width="720"></a>
+<!-- After uploading to YouTube, replace the links below with the video URLs. -->
+<a href="docs/media/mr-ducksafe-youtube.mp4"><img src="docs/media/thumbnail.png" alt="mr-ducksafe promo video — 525 CVEs → 14 actions" width="720"></a>
 
-- ▶️ **YouTube (1:26):** [docs/media/mr-ducksafe-youtube.mp4](docs/media/mr-ducksafe-youtube.mp4) — the problem, how it works, live demo, CI usage, privacy
-- 📱 **Shorts (0:35, vertical):** [docs/media/mr-ducksafe-short.mp4](docs/media/mr-ducksafe-short.mp4)
+- ▶️ **YouTube (1:58):** [docs/media/mr-ducksafe-youtube.mp4](docs/media/mr-ducksafe-youtube.mp4) — the problem, how it works, live demo, CI usage, privacy
+- 📱 **Shorts (0:37, vertical):** [docs/media/mr-ducksafe-short.mp4](docs/media/mr-ducksafe-short.mp4)
 
-The videos (Turkish on-screen text, music only — no voice-over) and the thumbnail are generated in code from real scan output (`scripts/demo/*.txt`) — see [Regenerating the promo material](#regenerating-the-promo-material).
+Both videos are narrated in English. They and the thumbnail are generated in code from the scan output in `scripts/demo/` — see [Regenerating the promo material](#regenerating-the-promo-material).
+
+---
 
 ## Why?
 
@@ -425,7 +427,7 @@ python scripts/video/render_video.py thumbnail      # thumbnail only
 python scripts/video/render_video.py preview short  # a few preview frames
 ```
 
-Terminal scenes are fed from the real output in `scripts/demo/*.txt`; music and sound effects are synthesized with numpy (no licensing issues). YouTube title/description/chapter text: [docs/media/YOUTUBE.md](docs/media/YOUTUBE.md).
+Terminal scenes use English translations (`scripts/demo/en/`) of the real scan output in `scripts/demo/*.txt`; music and sound effects are synthesized with numpy (no licensing issues). Narration runs locally with [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) (Apache-2.0): `pip install kokoro-onnx`, then download `onnx/model.onnx` and `voices/af_heart.bin` from [onnx-community/Kokoro-82M-v1.0-ONNX](https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX) and point `KOKORO_MODEL` / `KOKORO_VOICES` at them (details at the top of the script). Set `DUCKSAFE_TTS=off` to render without narration. YouTube title/description/chapter text: [docs/media/YOUTUBE.md](docs/media/YOUTUBE.md).
 
 **Documents:**
 - Design: [docs/superpowers/specs/2026-05-23-mr-ducksafe-design.md](docs/superpowers/specs/2026-05-23-mr-ducksafe-design.md)

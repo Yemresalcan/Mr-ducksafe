@@ -1,91 +1,94 @@
-# YouTube yükleme metinleri
+# YouTube upload text
 
-Videolar: [`mr-ducksafe-youtube.mp4`](mr-ducksafe-youtube.mp4) (1920×1080, 1:26) ·
-[`mr-ducksafe-short.mp4`](mr-ducksafe-short.mp4) (1080×1920, 0:35) ·
+Videos: [`mr-ducksafe-youtube.mp4`](mr-ducksafe-youtube.mp4) (1920×1080, 1:58) ·
+[`mr-ducksafe-short.mp4`](mr-ducksafe-short.mp4) (1080×1920, 0:37) ·
 Thumbnail: [`thumbnail.png`](thumbnail.png) (1280×720)
 
-Yükledikten sonra `README.md` ve `README.en.md` içindeki "Tanıtım Videosu / Promo Video"
-bölümünde `docs/media/*.mp4` linklerini YouTube URL'leriyle değiştir.
+After uploading, replace the `docs/media/*.mp4` links in the "Promo Video /
+Tanıtım Videosu" section of `README.en.md` and `README.md` with the YouTube URLs.
+
+Narration: Kokoro-82M, voice `af_heart` (Apache-2.0). Music and sound effects
+are synthesized in code, so there is nothing to credit or license.
 
 ---
 
-## 1. YouTube videosu (yatay)
+## 1. YouTube video (landscape)
 
-**Başlık** (≤ 100 karakter)
-
-```
-Bilgisayarında 525 Güvenlik Açığı mı Var? Tek Komutla Bul: mr-ducksafe (Ücretsiz CVE Tarayıcı)
-```
-
-Alternatifler:
-- `525 Açık → 14 Aksiyon: Windows'ta Güncel Olmayan Yazılımları Tek Komutla Bul`
-- `Windows İçin Ücretsiz ve Açık Kaynak CVE Tarayıcı — mr-ducksafe Tanıtım`
-
-**Açıklama**
+**Title** (≤ 100 characters)
 
 ```
-Bilgisayarındaki Chrome, Adobe Acrobat, Office, AnyDesk, Node.js… eski sürümleri yüzlerce bilinen güvenlik açığı (CVE) taşıyor. mr-ducksafe, Windows'ta kurulu yazılımları tarar, resmi NVD CVE veritabanıyla eşleştirir ve sonucu "525 açık" yerine "14 aksiyon" olarak, sade dilde ve çözüm komutuyla birlikte verir.
+525 Vulnerabilities on One Windows PC? Find Them With One Command — mr-ducksafe (Free CVE Scanner)
+```
+
+Alternatives:
+- `525 CVEs → 14 Actions: Find Outdated, Vulnerable Software on Windows in One Command`
+- `mr-ducksafe: a Free, Open-Source CVE Scanner for Windows Software`
+
+**Description**
+
+```
+Chrome, Adobe Reader, Office, AnyDesk, Node.js… old versions of everyday apps carry hundreds of publicly known vulnerabilities (CVEs). mr-ducksafe scans the software installed on Windows, checks it against the official NVD CVE database, and turns "525 vulnerabilities" into "14 actions" — explained in plain language, each with a fix command.
 
 🦆 GitHub: https://github.com/yemresalcan/mr-ducksafe
 
-✅ Tek .exe — kurulum, runtime, hesap yok
-✅ Resmi veri: NVD CVE API 2.0 (CPE + sürüm aralığı)
-✅ Riskler sade dilde: "bellek hatası yoluyla uygulama ele geçirilebilir"
-✅ Çözüm hazır: winget upgrade --id Google.Chrome
-✅ CI/CD: --fail-on=high, --format=json, exit kodları
-✅ %100 yerel tarama, telemetri yok — NVD'ye sadece {vendor, product, version} gider
-✅ Ücretsiz, açık kaynak (MIT)
+✅ Single .exe — no install, no runtime, no account
+✅ Official data: NVD CVE API 2.0 (CPE + version ranges)
+✅ Plain-language risk: "the application can be hijacked through a memory error"
+✅ Ready-made fix: winget upgrade --id Google.Chrome
+✅ CI/CD: --fail-on=high, --format=json, meaningful exit codes
+✅ 100% local scan, zero telemetry — NVD only sees {vendor, product, version}
+✅ Free and open source (MIT)
 
-⏱️ Bölümler
-0:00 Giriş
-0:05 Sorun: eski sürümler
-0:13 mr-ducksafe nedir?
-0:18 Nasıl çalışır?
-0:28 Demo: mr-ducksafe scan
-0:43 Sade dilde risk + çözüm
-0:50 Demo: --app ve --details
-0:58 CI/CD: --fail-on ve JSON
-1:07 Geçmiş ve gizlilik
-1:17 Kurulum ve bağlantılar
+⏱️ Chapters
+0:00 Intro
+0:08 The problem: outdated software
+0:21 What is mr-ducksafe?
+0:31 How it works
+0:51 Demo: mr-ducksafe scan
+1:07 Plain-language risk + fix
+1:19 Demo: --app and --details
+1:27 CI/CD: --fail-on and JSON
+1:38 History and privacy
+1:49 Install and links
 
-📦 Kurulum
+📦 Install
 • GitHub Releases → mr-ducksafe.exe
 • go install github.com/yemresalcan/mr-ducksafe/cmd/mr-ducksafe@latest
 
-🔑 Ücretsiz NVD API key (10x hızlı tarama): https://nvd.nist.gov/developers/request-an-api-key
+🔑 Free NVD API key (10x faster scans): https://nvd.nist.gov/developers/request-an-api-key
 
-#güvenlik #cybersecurity #CVE #Windows #açıkkaynak #golang #devsecops
+#cybersecurity #CVE #Windows #opensource #golang #devsecops #infosec
 ```
 
-**Etiketler**
+**Tags**
 
 ```
-mr-ducksafe, cve tarayıcı, cve scanner, güvenlik açığı, zafiyet taraması, vulnerability scanner, nvd, national vulnerability database, windows güvenlik, winget, devsecops, siber güvenlik, cybersecurity, açık kaynak, open source, golang, go cli, ci cd güvenlik, yazılım güncelleme, sbom
+mr-ducksafe, cve scanner, vulnerability scanner, nvd, national vulnerability database, windows security, outdated software, winget, devsecops, cybersecurity, infosec, open source, golang, go cli, ci cd security, patch management, sbom, security tools
 ```
 
-- Kategori: **Bilim ve Teknoloji**
-- Dil: **Türkçe**
+- Category: **Science & Technology**
+- Language: **English**
 - Thumbnail: `thumbnail.png`
 
 ---
 
-## 2. YouTube Shorts (dikey)
+## 2. YouTube Shorts (vertical)
 
-**Başlık**
-
-```
-Bilgisayarında kaç güvenlik açığı var? 🦆 #shorts
-```
-
-**Açıklama**
+**Title**
 
 ```
-Tek komut: mr-ducksafe scan
-525 bilinen açık → 14 net aksiyon, sade dilde risk ve winget çözüm komutu.
-Ücretsiz & açık kaynak: https://github.com/yemresalcan/mr-ducksafe
-
-#shorts #cybersecurity #güvenlik #windows #cve #opensource #devsecops
+How many security holes are on your PC? 🦆 #shorts
 ```
 
-> Shorts'ta altyazı/başlık alanı ekranın alt ~%20'sini kaplar; videodaki önemli
-> içerik bu bölgenin dışında tutuldu.
+**Description**
+
+```
+One command: mr-ducksafe scan
+525 known vulnerabilities → 14 clear actions, with plain-language risk and a winget fix.
+Free & open source: https://github.com/yemresalcan/mr-ducksafe
+
+#shorts #cybersecurity #windows #cve #opensource #devsecops #infosec
+```
+
+> On Shorts the title/caption overlay covers roughly the bottom 20% of the
+> screen; the important content in the video stays above that area.
