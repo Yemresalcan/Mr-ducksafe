@@ -22,7 +22,17 @@
 
 </div>
 
--
+---
+
+## 🎬 Tanıtım Videosu
+
+<!-- YouTube'a yükledikten sonra aşağıdaki iki linki video URL'leriyle değiştir. -->
+<a href="docs/media/mr-ducksafe-youtube.mp4"><img src="docs/media/thumbnail.png" alt="mr-ducksafe tanıtım videosu — 525 açık → 14 aksiyon" width="720"></a>
+
+- ▶️ **YouTube (1:26):** [docs/media/mr-ducksafe-youtube.mp4](docs/media/mr-ducksafe-youtube.mp4) — sorun, nasıl çalışır, canlı demo, CI kullanımı, gizlilik
+- 📱 **Shorts (0:35, dikey):** [docs/media/mr-ducksafe-short.mp4](docs/media/mr-ducksafe-short.mp4)
+
+Videolar ve thumbnail, gerçek tarama çıktılarından (`scripts/demo/*.txt`) kodla üretilir — bkz. [Tanıtım materyallerini yeniden üretmek](#tanıtım-materyallerini-yeniden-üretmek).
 
 ## Neden?
 
@@ -38,6 +48,31 @@ Bilgisayarındaki Adobe Acrobat, Chrome, Office, Java... bunların **eski sürü
 - 🔒 **Gizlilik:** tarama tamamen lokal; sadece anonim `{vendor, product, version}` NVD'ye gider
 
 **Platform:** Windows. Linux/macOS v0.2'de planlanıyor.
+
+---
+
+## Nasıl Çalışır?
+
+```
+ 1. Tara            2. Eşleştir           3. Sorgula               4. Açıkla
+ Windows Registry → 50 hazır mapping   → NVD CVE API 2.0       → sade dilde risk
+ (kurulu programlar)  ile ad → CPE        (CPE + sürüm aralığı)    + winget / güncelleme linki
+   143 program          21 eşleşme          525 CVE                  14 aksiyon
+```
+
+1. **Tara** — `HKLM`/`HKCU` Uninstall anahtarlarından kurulu yazılımların adı, sürümü ve yayıncısı okunur.
+2. **Eşleştir** — Her program, [`mappings.yaml`](internal/matcher/data/mappings.yaml) içindeki kurallarla (tam ad veya regex) bir **CPE** kimliğine bağlanır. Eşleşmeyenler `--show-unmatched` ile görülebilir.
+3. **Sorgula** — Eşleşen her CPE için NVD'ye istek atılır; CVE'lerin etkilenen sürüm aralıkları kurulu sürümle karşılaştırılır.
+4. **Açıkla** — Bulgular uygulama bazında gruplanır, en ciddi olan üstte olacak şekilde sıralanır; her grup için aciliyet, sade dilde risk ve çözüm komutu üretilir.
+
+### Hız ve rate limit
+
+| | İstek limiti (NVD) | Tipik tarama (~20 eşleşme) |
+|---|---|---|
+| `NVD_API_KEY` yok | 5 istek / 30 sn (~6 sn aralık) | ~2 dakika |
+| `NVD_API_KEY` var | 50 istek / 30 sn (~0.7 sn aralık) | ~15–20 saniye |
+
+Aynı `{CPE, sürüm}` sorgusu tek tarama içinde tekrar atılmaz (bellek içi cache).
 
 ---
 
@@ -58,6 +93,16 @@ scoop install https://github.com/yemresalcan/mr-ducksafe/releases/latest/downloa
 
 > Scoop manifest sonraki sürümde release artifact'i olarak yayınlanacak.
 
+### `go install`
+
+Go 1.25+ kuruluysa tek komut:
+
+```sh
+go install github.com/yemresalcan/mr-ducksafe/cmd/mr-ducksafe@latest
+```
+
+> Binary `%USERPROFILE%\go\bin` (veya `$GOPATH/bin`) altına kurulur; bu klasörün PATH'te olduğundan emin ol.
+
 ### Kaynaktan build
 
 Go 1.25+ gerekli.
@@ -76,6 +121,10 @@ go build -o mr-ducksafe.exe ./cmd/mr-ducksafe
 setx NVD_API_KEY "<key>"
 ```
 > Yeni terminal aç. `setx` mevcut oturumu etkilemez.
+
+### Kaldırma
+
+`mr-ducksafe.exe` dosyasını ve tarama geçmişinin tutulduğu `%USERPROFILE%\.mr-ducksafe\` klasörünü silmen yeterli. Registry'ye veya sisteme başka bir şey yazılmaz.
 
 ---
 
@@ -235,6 +284,113 @@ cmd/mr-ducksafe ──► internal/cmd (Cobra: scan/history/prune/version)
 
 ---
 
+## CI/CD'de Kullanım
+
+`--fail-on` eşiği aşıldığında süreç **exit 1** ile biter; bu yüzden pipeline'ı doğrudan kırmızıya çevirir. Örnek GitHub Actions iş akışı (Windows runner üzerinde haftalık tarama + JSON raporu artifact olarak saklama):
+
+```yaml
+# .github/workflows/cve-scan.yml
+name: cve-scan
+on:
+  schedule: [{ cron: "0 6 * * 1" }]   # her pazartesi 06:00 UTC
+  workflow_dispatch:
+jobs:
+  scan:
+    runs-on: windows-latest            # veya kendi self-hosted Windows runner'ın
+    steps:
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.25" }
+      - run: go install github.com/yemresalcan/mr-ducksafe/cmd/mr-ducksafe@latest
+      - run: mr-ducksafe scan --fail-on=high --format=json -o report.json
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: cve-report, path: report.json }
+```
+
+> Asıl değer, **kendi makinelerini** tarayan self-hosted runner'larda veya zamanlanmış görevlerde (Task Scheduler) ortaya çıkar; GitHub'ın hazır runner'ı yalnızca kendi imajını tarar.
+
+### JSON çıktı şeması
+
+`--format=json` ile üretilen rapor (`schemaVersion: "1"`):
+
+```json
+{
+  "schemaVersion": "1",
+  "scanId": 15,
+  "startedAt": "2026-06-04T22:56:04+03:00",
+  "finishedAt": "2026-06-04T22:56:19+03:00",
+  "appsTotal": 143,
+  "countsBySeverity": { "critical": 7, "high": 322, "medium": 163, "low": 33 },
+  "findings": [
+    {
+      "appName": "Google Chrome",
+      "appVersion": "148.0.7778.217",
+      "cveId": "CVE-2013-6647",
+      "severity": "critical",
+      "summary": "A use-after-free in AnimationController::endAnimationUpdate in Google Chrome ..."
+    }
+  ],
+  "unmatched": [
+    { "name": "Some Internal Tool", "version": "1.2.3", "publisher": "Contoso" }
+  ]
+}
+```
+
+- `severity`: `critical` · `high` · `medium` · `low` (· `unknown`)
+- `fixedVersion` ve `references` yalnızca veri kaynağı bu bilgiyi verdiğinde bulunur (boşsa alan hiç yazılmaz).
+- `warnings` yalnızca kısmi hatalarda (örn. tek bir NVD isteği başarısız olduğunda) bulunur.
+- `--format=markdown` ise PR yorumu / wiki için hazır bir tablo üretir.
+
+---
+
+## Desteklenen Uygulamalar (50)
+
+<details>
+<summary>Listeyi göster</summary>
+
+| Kategori | Uygulamalar |
+|---|---|
+| Tarayıcılar | Google Chrome · Mozilla Firefox · Microsoft Edge · Opera · Brave · Vivaldi |
+| Ofis, PDF, e-posta | Microsoft Office · Adobe Acrobat Reader · LibreOffice · Thunderbird |
+| Geliştirici araçları | Python 3 · Node.js · Git · Java (JRE) · Java SE Development Kit · Visual Studio Code · IntelliJ IDEA · PyCharm · GoLand · WebStorm · Docker Desktop · Postman · MySQL Workbench · OpenSSL |
+| İletişim ve bulut | Discord · Slack · Zoom · Microsoft Teams · Microsoft OneDrive |
+| Uzak erişim, ağ, dosya transferi | TeamViewer · AnyDesk · PuTTY · FileZilla Client · WinSCP · Wireshark · OpenVPN |
+| Medya ve tasarım | VLC media player · OBS Studio · Spotify · Steam · Adobe Photoshop · Adobe Illustrator · Adobe Premiere Pro · GIMP · Inkscape · Blender · Audacity |
+| Araçlar | 7-Zip · Notepad++ · WinRAR |
+
+Kaynak: [`internal/matcher/data/mappings.yaml`](internal/matcher/data/mappings.yaml). Listede olmayan bir uygulama için [yeni mapping](#katkı-yeni-mapping-eklemek) PR'ı açabilirsin.
+
+</details>
+
+---
+
+## SSS / Sorun Giderme
+
+**Tarama çok yavaş.**
+`NVD_API_KEY` tanımlı değilse NVD 30 saniyede yalnızca 5 isteğe izin verir. Ücretsiz key ile ~10 kat hızlanır (bkz. [NVD API key](#nvd-api-key-önerilen--10x-hızlı)).
+
+**Bir uygulamam raporda yok.**
+Muhtemelen eşleştirilemedi. `mr-ducksafe scan --show-unmatched` ile kontrol et; listede yoksa bir mapping PR'ı ya da [yeni mapping issue'su](.github/ISSUE_TEMPLATE/new_mapping.yml) aç.
+
+**"Çözüm" satırı "Uygulamayı en son sürüme güncelleyin" diyor, `winget` komutu yok.**
+O uygulama için mapping'de `winget_id` tanımlı değil. Tanımlıysa tek komutla güncelleyebilirsin.
+
+**Bazı CVE'ler çok eski görünüyor (2008, 2012...).**
+NVD bu kayıtları ilgili CPE'nin *tüm* sürümleri için etkilenmiş olarak işaretliyor (çoğu protokol seviyesi açık: TLS, SPDY vb.). Özet görünüm bunları gruplar; `--details` ham listeyi gösterir.
+
+**Windows SmartScreen uyarı veriyor.**
+Release binary'leri henüz kod imzalı değil. İndirdiğin arşivin SHA256 değerini `checksums.txt` ile doğrulayıp "Ek bilgi → Yine de çalıştır" diyebilirsin.
+
+**Linux/macOS'ta `scanner: bu işletim sistemi henüz desteklenmiyor` hatası.**
+Release'te Linux/macOS binary'leri de var ama yazılım tarayıcısı şu an yalnızca Windows Registry'yi okuyor. dpkg/rpm/Homebrew desteği v0.2'de.
+
+**Exit kodu 2 aldım.**
+Tarama hatası: çoğunlukla NVD'ye ulaşılamadı (ağ, proxy, NVD bakımı). Nedeni stderr'de `scan failed: ...` satırında yazar.
+
+---
+
 ## Bilinen Sınırlamalar (MVP)
 
 - **50 uygulama mapping'i** — top yazılımları kapsar; geri kalan "eşleştirilemedi" görünür. Topluluk PR'larıyla genişler.
@@ -258,6 +414,18 @@ goreleaser release --snapshot --clean
 .\scripts\build.ps1 -Version "0.1.0"
 ./scripts/build.sh 0.1.0
 ```
+
+### Tanıtım materyallerini yeniden üretmek
+
+README'deki thumbnail ve `docs/media/` altındaki videolar kodla üretilir (Python 3.10+, Pillow, numpy, ffmpeg gerekir):
+
+```sh
+python scripts/video/render_video.py              # thumbnail + YouTube + Shorts
+python scripts/video/render_video.py thumbnail    # sadece thumbnail
+python scripts/video/render_video.py preview short  # birkaç kare önizleme
+```
+
+Terminal sahneleri `scripts/demo/*.txt` içindeki gerçek çıktılardan beslenir; müzik ve efektler numpy ile sentezlenir (telif riski yok). YouTube başlık/açıklama/bölüm metinleri: [docs/media/YOUTUBE.md](docs/media/YOUTUBE.md).
 
 **Dokümanlar:**
 - Tasarım: [docs/superpowers/specs/2026-05-23-mr-ducksafe-design.md](docs/superpowers/specs/2026-05-23-mr-ducksafe-design.md)

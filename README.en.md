@@ -22,7 +22,17 @@ Not 500+ CVEs → ~10 action items. Risk in plain language, fix in one command.
 
 </div>
 
--
+---
+
+## 🎬 Promo Video
+
+<!-- After uploading to YouTube, replace the two links below with the video URLs. -->
+<a href="docs/media/mr-ducksafe-youtube.mp4"><img src="docs/media/thumbnail.png" alt="mr-ducksafe promo video — 525 vulnerabilities → 14 action items" width="720"></a>
+
+- ▶️ **YouTube (1:26):** [docs/media/mr-ducksafe-youtube.mp4](docs/media/mr-ducksafe-youtube.mp4) — the problem, how it works, live demo, CI usage, privacy
+- 📱 **Shorts (0:35, vertical):** [docs/media/mr-ducksafe-short.mp4](docs/media/mr-ducksafe-short.mp4)
+
+The videos (Turkish on-screen text, music only — no voice-over) and the thumbnail are generated in code from real scan output (`scripts/demo/*.txt`) — see [Regenerating the promo material](#regenerating-the-promo-material).
 
 ## Why?
 
@@ -38,6 +48,31 @@ The Adobe Acrobat, Chrome, Office, Java... on your machine — their **old versi
 - 🔒 **Privacy:** scanning is fully local; only anonymous `{vendor, product, version}` goes to NVD
 
 **Platform:** Windows. Linux/macOS planned for v0.2.
+
+---
+
+## How It Works
+
+```
+ 1. Scan             2. Match              3. Query                 4. Explain
+ Windows Registry → 50 curated mappings → NVD CVE API 2.0       → plain-language risk
+ (installed apps)     name → CPE            (CPE + version range)    + winget / update link
+   143 apps             21 matches          525 CVEs                 14 action items
+```
+
+1. **Scan** — name, version and publisher of installed software are read from the `HKLM`/`HKCU` Uninstall keys.
+2. **Match** — each program is linked to a **CPE** identifier using the rules (exact name or regex) in [`mappings.yaml`](internal/matcher/data/mappings.yaml). Unmatched programs can be listed with `--show-unmatched`.
+3. **Query** — NVD is queried for every matched CPE; each CVE's affected version ranges are compared with the installed version.
+4. **Explain** — findings are grouped per application and sorted most-severe first; each group gets an urgency, a plain-language risk and a fix command.
+
+### Speed and rate limits
+
+| | NVD request limit | Typical scan (~20 matches) |
+|---|---|---|
+| no `NVD_API_KEY` | 5 requests / 30 s (~6 s apart) | ~2 minutes |
+| with `NVD_API_KEY` | 50 requests / 30 s (~0.7 s apart) | ~15–20 seconds |
+
+The same `{CPE, version}` query is never sent twice within one scan (in-memory cache).
 
 ---
 
@@ -58,6 +93,16 @@ scoop install https://github.com/yemresalcan/mr-ducksafe/releases/latest/downloa
 
 > The Scoop manifest will ship as a release artifact in the next version.
 
+### `go install`
+
+With Go 1.25+ installed, one command:
+
+```sh
+go install github.com/yemresalcan/mr-ducksafe/cmd/mr-ducksafe@latest
+```
+
+> The binary lands in `%USERPROFILE%\go\bin` (or `$GOPATH/bin`); make sure that folder is on your PATH.
+
 ### Build from source
 
 Requires Go 1.25+.
@@ -76,6 +121,10 @@ go build -o mr-ducksafe.exe ./cmd/mr-ducksafe
 setx NVD_API_KEY "<key>"
 ```
 > Open a new terminal. `setx` does not affect the current session.
+
+### Uninstall
+
+Delete `mr-ducksafe.exe` and the `%USERPROFILE%\.mr-ducksafe\` folder that holds scan history. Nothing else is written to the registry or the system.
 
 ---
 
@@ -235,6 +284,113 @@ cmd/mr-ducksafe ──► internal/cmd (Cobra: scan/history/prune/version)
 
 ---
 
+## Using It in CI/CD
+
+When the `--fail-on` threshold is crossed the process exits with **code 1**, so it turns a pipeline red on its own. Example GitHub Actions workflow (weekly scan on a Windows runner, JSON report kept as an artifact):
+
+```yaml
+# .github/workflows/cve-scan.yml
+name: cve-scan
+on:
+  schedule: [{ cron: "0 6 * * 1" }]   # every Monday 06:00 UTC
+  workflow_dispatch:
+jobs:
+  scan:
+    runs-on: windows-latest            # or your own self-hosted Windows runner
+    steps:
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.25" }
+      - run: go install github.com/yemresalcan/mr-ducksafe/cmd/mr-ducksafe@latest
+      - run: mr-ducksafe scan --fail-on=high --format=json -o report.json
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: cve-report, path: report.json }
+```
+
+> The real value shows up on self-hosted runners or scheduled tasks (Task Scheduler) that scan **your own machines**; a GitHub-hosted runner only scans its own image.
+
+### JSON output schema
+
+Report produced by `--format=json` (`schemaVersion: "1"`):
+
+```json
+{
+  "schemaVersion": "1",
+  "scanId": 15,
+  "startedAt": "2026-06-04T22:56:04+03:00",
+  "finishedAt": "2026-06-04T22:56:19+03:00",
+  "appsTotal": 143,
+  "countsBySeverity": { "critical": 7, "high": 322, "medium": 163, "low": 33 },
+  "findings": [
+    {
+      "appName": "Google Chrome",
+      "appVersion": "148.0.7778.217",
+      "cveId": "CVE-2013-6647",
+      "severity": "critical",
+      "summary": "A use-after-free in AnimationController::endAnimationUpdate in Google Chrome ..."
+    }
+  ],
+  "unmatched": [
+    { "name": "Some Internal Tool", "version": "1.2.3", "publisher": "Contoso" }
+  ]
+}
+```
+
+- `severity`: `critical` · `high` · `medium` · `low` (· `unknown`)
+- `fixedVersion` and `references` appear only when the data source provides them (empty fields are omitted).
+- `warnings` appears only on partial failures (e.g. a single NVD request failed).
+- `--format=markdown` produces a table ready for a PR comment or wiki page.
+
+---
+
+## Supported Applications (50)
+
+<details>
+<summary>Show the list</summary>
+
+| Category | Applications |
+|---|---|
+| Browsers | Google Chrome · Mozilla Firefox · Microsoft Edge · Opera · Brave · Vivaldi |
+| Office, PDF, email | Microsoft Office · Adobe Acrobat Reader · LibreOffice · Thunderbird |
+| Developer tools | Python 3 · Node.js · Git · Java (JRE) · Java SE Development Kit · Visual Studio Code · IntelliJ IDEA · PyCharm · GoLand · WebStorm · Docker Desktop · Postman · MySQL Workbench · OpenSSL |
+| Communication & cloud | Discord · Slack · Zoom · Microsoft Teams · Microsoft OneDrive |
+| Remote access, network, file transfer | TeamViewer · AnyDesk · PuTTY · FileZilla Client · WinSCP · Wireshark · OpenVPN |
+| Media & design | VLC media player · OBS Studio · Spotify · Steam · Adobe Photoshop · Adobe Illustrator · Adobe Premiere Pro · GIMP · Inkscape · Blender · Audacity |
+| Utilities | 7-Zip · Notepad++ · WinRAR |
+
+Source: [`internal/matcher/data/mappings.yaml`](internal/matcher/data/mappings.yaml). Missing an app? Open a [new mapping](#contributing-adding-a-new-mapping) PR.
+
+</details>
+
+---
+
+## FAQ / Troubleshooting
+
+**The scan is very slow.**
+Without `NVD_API_KEY`, NVD allows only 5 requests per 30 seconds. A free key makes it ~10x faster (see [NVD API key](#nvd-api-key-recommended--10x-faster)).
+
+**One of my applications is missing from the report.**
+It probably could not be matched. Check with `mr-ducksafe scan --show-unmatched`; if it is listed there, open a mapping PR or a [new mapping issue](.github/ISSUE_TEMPLATE/new_mapping.yml).
+
+**The "Fix" line says "Update the application to the latest version" instead of a `winget` command.**
+That application's mapping has no `winget_id` yet. When it does, you can update with one command.
+
+**Some CVEs look very old (2008, 2012...).**
+NVD flags these for *all* versions of the CPE (mostly protocol-level issues: TLS, SPDY, etc.). The summary view groups them; `--details` shows the raw list.
+
+**Windows SmartScreen shows a warning.**
+Release binaries are not code-signed yet. Verify the archive's SHA256 against `checksums.txt`, then choose "More info → Run anyway".
+
+**`scanner: bu işletim sistemi henüz desteklenmiyor` (OS not supported) on Linux/macOS.**
+Linux/macOS binaries are published, but the software scanner currently only reads the Windows Registry. dpkg/rpm/Homebrew support is planned for v0.2.
+
+**I got exit code 2.**
+Scan error — usually NVD was unreachable (network, proxy, NVD maintenance). The cause is printed to stderr on the `scan failed: ...` line.
+
+---
+
 ## Known Limitations (MVP)
 
 - **50 application mappings** — covers top software; the rest show up as "unmatched". Grows through community PRs.
@@ -258,6 +414,18 @@ goreleaser release --snapshot --clean
 .\scripts\build.ps1 -Version "0.1.0"
 ./scripts/build.sh 0.1.0
 ```
+
+### Regenerating the promo material
+
+The README thumbnail and the videos under `docs/media/` are generated in code (requires Python 3.10+, Pillow, numpy, ffmpeg):
+
+```sh
+python scripts/video/render_video.py                # thumbnail + YouTube + Shorts
+python scripts/video/render_video.py thumbnail      # thumbnail only
+python scripts/video/render_video.py preview short  # a few preview frames
+```
+
+Terminal scenes are fed from the real output in `scripts/demo/*.txt`; music and sound effects are synthesized with numpy (no licensing issues). YouTube title/description/chapter text: [docs/media/YOUTUBE.md](docs/media/YOUTUBE.md).
 
 **Documents:**
 - Design: [docs/superpowers/specs/2026-05-23-mr-ducksafe-design.md](docs/superpowers/specs/2026-05-23-mr-ducksafe-design.md)
