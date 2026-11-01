@@ -91,7 +91,7 @@ func runScan(cmd *cobra.Command, _ []string) error {
 	result, err := runWithProgress(ctx, eng, stderr, tty)
 	if err != nil {
 		fmt.Fprintln(stderr, "scan failed:", err)
-		os.Exit(2)
+		exitFunc(2)
 	}
 
 	out := cmd.OutOrStdout()
@@ -115,7 +115,7 @@ func runScan(cmd *cobra.Command, _ []string) error {
 	}
 
 	if shouldFail(result, flagScanFailOn) {
-		os.Exit(1)
+		exitFunc(1)
 	}
 	return nil
 }

@@ -2,6 +2,9 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -39,5 +42,12 @@ func NewRootCmd() *cobra.Command {
 
 // Execute mr-ducksafe CLI'sini çalıştırır.
 func Execute() error {
-	return NewRootCmd().Execute()
+	root := NewRootCmd()
+	done := prepareDoubleClick(root)
+	err := root.Execute()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "error:", err)
+	}
+	done()
+	return err
 }

@@ -382,6 +382,9 @@ O uygulama için mapping'de `winget_id` tanımlı değil. Tanımlıysa tek komut
 **Bazı CVE'ler çok eski görünüyor (2008, 2012...).**
 NVD bu kayıtları ilgili CPE'nin *tüm* sürümleri için etkilenmiş olarak işaretliyor (çoğu protokol seviyesi açık: TLS, SPDY vb.). Özet görünüm bunları gruplar; `--details` ham listeyi gösterir.
 
+**`mr-ducksafe.exe`'ye çift tıklayınca bir pencere açılıyor, normal mi?**
+Evet. Explorer'dan açıldığında `mr-ducksafe scan` çalıştırır, raporu gösterir ve pencereyi kapatmadan önce Enter'a basmanı bekler. Diğer komutlar ve seçenekler için bir terminal (PowerShell veya cmd) açıp oradan çalıştır.
+
 **Windows SmartScreen uyarı veriyor.**
 Release binary'leri henüz kod imzalı değil. İndirdiğin arşivin SHA256 değerini `checksums.txt` ile doğrulayıp "Ek bilgi → Yine de çalıştır" diyebilirsin.
 

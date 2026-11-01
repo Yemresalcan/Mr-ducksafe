@@ -382,6 +382,9 @@ That application's mapping has no `winget_id` yet. When it does, you can update 
 **Some CVEs look very old (2008, 2012...).**
 NVD flags these for *all* versions of the CPE (mostly protocol-level issues: TLS, SPDY, etc.). The summary view groups them; `--details` shows the raw list.
 
+**Double-clicking `mr-ducksafe.exe` opens a window — is that right?**
+Yes. When started from Explorer it runs `mr-ducksafe scan`, shows the report and waits for Enter before closing. For other commands and flags, open a terminal (PowerShell or cmd) and run it there.
+
 **Windows SmartScreen shows a warning.**
 Release binaries are not code-signed yet. Verify the archive's SHA256 against `checksums.txt`, then choose "More info → Run anyway".
 
