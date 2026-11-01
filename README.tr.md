@@ -62,6 +62,8 @@ Bilgisayarındaki Adobe Acrobat, Chrome, Office, Java... bunların **eski sürü
    143 program          21 eşleşme          525 CVE                  14 aksiyon
 ```
 
+*Sayılar bir geliştirici bilgisayarındaki örnek taramadan; senin sonuçların farklı olacaktır.*
+
 1. **Tara** — `HKLM`/`HKCU` Uninstall anahtarlarından kurulu yazılımların adı, sürümü ve yayıncısı okunur.
 2. **Eşleştir** — Her program, [`mappings.yaml`](internal/matcher/data/mappings.yaml) içindeki kurallarla (tam ad veya regex) bir **CPE** kimliğine bağlanır. Eşleşmeyenler `--show-unmatched` ile görülebilir.
 3. **Sorgula** — Eşleşen her CPE için NVD'ye istek atılır; CVE'lerin etkilenen sürüm aralıkları kurulu sürümle karşılaştırılır.

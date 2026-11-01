@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>mr-ducksafe — CVE scanner for Windows software</title>
-  <meta name="description" content="Free, open-source NVD CVE scanner for the software installed on Windows. One .exe, one command: 525 CVEs become 14 clear actions, each with a plain-language risk and a fix.">
+  <meta name="description" content="Free, open-source NVD CVE scanner for the software installed on Windows. One .exe, one command: hundreds of CVEs become a short list of actions, each with a plain-language risk and a fix.">
   <link rel="canonical" href="https://ducksafe.yesoftware.dev/">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <meta name="theme-color" content="#050608">
   <meta property="og:type" content="website">
   <meta property="og:title" content="mr-ducksafe — find the vulnerable software on your Windows PC">
-  <meta property="og:description" content="One command. 525 known CVEs → 14 clear actions, in plain language, each with a fix.">
+  <meta property="og:description" content="One command turns hundreds of known CVEs into a short list of actions — in plain language, each with a fix.">
   <meta property="og:url" content="https://ducksafe.yesoftware.dev/">
   <meta property="og:image" content="https://ducksafe.yesoftware.dev/media/thumbnail.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -112,6 +112,8 @@
     .hero-body h1 em { font-style: normal; color: var(--yellow); }
     .hero-body p { color: #B4BFCC; font-size: 19px; max-width: 680px; margin: 0 auto 36px; font-weight: 300; }
     .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+    .hero-body p.hero-note { margin: 26px auto 0; font-size: 15px; color: var(--faint); }
+    .hero-note b { color: #C9D2DD; font-weight: 500; }
     .apps { position: relative; z-index: 2; padding: 26px 0 34px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
     .apps-label { position: relative; z-index: 2; text-align: center; font: 600 12px var(--sans); letter-spacing: .24em; text-transform: uppercase; color: var(--faint); margin-top: 56px; }
     .marquee { display: flex; gap: 44px; width: max-content; animation: slide 60s linear infinite; }
@@ -306,7 +308,7 @@
 
     <div class="hero-spacer" aria-hidden="true"></div>
     <div class="hero-body">
-      <h1 data-i18n="hero.title">The CVE scanner that turns <em>525 vulnerabilities</em> into 14 actions</h1>
+      <h1 data-i18n="hero.title">The CVE scanner that turns <em>hundreds of vulnerabilities</em> into a short list of actions</h1>
       <p data-i18n="hero.lead">mr-ducksafe scans the software installed on Windows, checks it against the official NVD database and tells you — in plain language — what to update first and how.</p>
       <div class="hero-cta">
         <a class="pill pill-y" href="https://github.com/Yemresalcan/Mr-ducksafe/releases/download/v0.1.1/mr-ducksafe_0.1.1_Windows_x86_64.zip">
@@ -315,6 +317,7 @@
         </a>
         <a class="pill pill-dark" href="https://github.com/Yemresalcan/Mr-ducksafe" data-i18n="hero.cta2">View on GitHub</a>
       </div>
+      <p class="hero-note" data-i18n="hero.example">Example from a real developer PC: <b>525</b> known CVEs → <b>14</b> actions.</p>
     </div>
 
     <div class="apps-label" data-i18n="hero.apps">Checks 50 popular Windows apps, including</div>
@@ -559,7 +562,7 @@
           <div>
             <div class="group-title" data-i18n="stats.g1">Clarity</div>
             <div class="scards">
-              <div class="scard"><small data-i18n="stats.s1.k">From 525 CVEs to</small><b>14</b><span data-i18n="stats.s1.v">clear actions</span></div>
+              <div class="scard"><small data-i18n="stats.s1.k">Sample scan: 525 CVEs →</small><b>14</b><span data-i18n="stats.s1.v">clear actions</span></div>
               <div class="scard"><small data-i18n="stats.s2.k">Curated mappings</small><b>50</b><span data-i18n="stats.s2.v">popular Windows apps</span></div>
             </div>
           </div>
@@ -655,7 +658,8 @@
       var TR = {
         "skip": "İçeriğe geç",
         "nav.how": "Nasıl çalışır", "nav.features": "Özellikler", "nav.outputs": "Çıktılar ve CI", "nav.start": "Başlarken", "nav.download": "İndir",
-        "hero.title": "<em>525 güvenlik açığını</em> 14 aksiyona çeviren CVE tarayıcı",
+        "hero.title": "<em>Yüzlerce güvenlik açığını</em> kısa bir aksiyon listesine çeviren CVE tarayıcı",
+        "hero.example": "Gerçek bir geliştirici bilgisayarından örnek: <b>525</b> bilinen CVE → <b>14</b> aksiyon.",
         "hero.lead": "mr-ducksafe, Windows'ta kurulu yazılımları tarar, resmi NVD veritabanıyla karşılaştırır ve önce neyi, nasıl güncellemen gerektiğini sade bir dille söyler.",
         "hero.cta": "Windows için indir", "hero.cta2": "GitHub'da incele",
         "hero.apps": "50 popüler Windows uygulamasını kontrol eder, örneğin",
@@ -692,7 +696,7 @@
         "tri.3.t": "JSON ve Markdown", "tri.3.d": "Script ve CI için <code>--format=json</code>, PR yorumu ve wiki için <code>--format=markdown</code>.",
         "stats.eyebrow": "Rakamlarla", "stats.title": "Gerçek bir geliştirici bilgisayarında tek bir tarama",
         "stats.g1": "Netlik", "stats.g2": "Hız ve gizlilik",
-        "stats.s1.k": "525 CVE'den", "stats.s1.v": "net aksiyona",
+        "stats.s1.k": "Örnek tarama: 525 CVE →", "stats.s1.v": "net aksiyona",
         "stats.s2.k": "Hazır eşleme", "stats.s2.v": "popüler Windows uygulaması",
         "stats.s3.k": "Ücretsiz NVD key ile", "stats.s3.v": "tam tarama",
         "stats.s4.k": "Gönderilen telemetri", "stats.s4.v": "bayt, hiçbir zaman",
@@ -718,7 +722,7 @@
       var META = {
         en: { title: document.title, desc: document.querySelector('meta[name="description"]').content },
         tr: { title: "mr-ducksafe — Windows yazılımları için CVE tarayıcı",
-              desc: "Windows'ta kurulu yazılımlar için ücretsiz, açık kaynak NVD CVE tarayıcı. Tek .exe, tek komut: 525 CVE, sade dilde risk ve çözümüyle 14 net aksiyona dönüşür." }
+              desc: "Windows'ta kurulu yazılımlar için ücretsiz, açık kaynak NVD CVE tarayıcı. Tek .exe, tek komut: yüzlerce CVE, sade dilde risk ve çözümüyle kısa bir aksiyon listesine dönüşür." }
       };
       var nodes = Array.prototype.slice.call(document.querySelectorAll('[data-i18n]'));
       var EN = {};

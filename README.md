@@ -62,6 +62,8 @@ The Adobe Acrobat, Chrome, Office, Java... on your machine — their **old versi
    143 apps             21 matches          525 CVEs                 14 action items
 ```
 
+*Numbers from one sample scan of a developer PC — your results will differ.*
+
 1. **Scan** — name, version and publisher of installed software are read from the `HKLM`/`HKCU` Uninstall keys.
 2. **Match** — each program is linked to a **CPE** identifier using the rules (exact name or regex) in [`mappings.yaml`](internal/matcher/data/mappings.yaml). Unmatched programs can be listed with `--show-unmatched`.
 3. **Query** — NVD is queried for every matched CPE; each CVE's affected version ranges are compared with the installed version.
