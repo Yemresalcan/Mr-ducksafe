@@ -6,7 +6,7 @@
 
 Not 500+ CVEs → ~10 action items. Risk in plain language, fix in one command.
 
-**🇬🇧 English** · [🇹🇷 Türkçe](README.tr.md)
+**🇬🇧 English** · [🇹🇷 Türkçe](README.tr.md) · [🌐 Website](https://ducksafe.yesoftware.dev)
 
 [![CI](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/ci.yml/badge.svg)](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/ci.yml)
 [![Release](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/release.yml/badge.svg)](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/release.yml)
