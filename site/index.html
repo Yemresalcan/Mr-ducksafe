@@ -73,9 +73,9 @@
 
     /* ---------- nav ---------- */
     .topbar { position: fixed; top: 16px; left: 16px; right: 16px; z-index: 50; transition: top .25s ease; }
-    .topbar .nav { max-width: none; border: 1px solid transparent; border-radius: 22px; transition: background .25s ease, border-color .25s ease, box-shadow .25s ease, height .25s ease; }
+    .topbar .nav { max-width: 100%; margin: 0 auto; border: 1px solid transparent; border-radius: 22px; transition: max-width .35s ease, background .25s ease, border-color .25s ease, box-shadow .25s ease, height .25s ease, padding .25s ease; }
     .topbar.scrolled { top: 10px; }
-    .topbar.scrolled .nav { height: 66px; background: rgba(8,11,15,.82); -webkit-backdrop-filter: saturate(150%) blur(14px); backdrop-filter: saturate(150%) blur(14px); border-color: var(--line); box-shadow: 0 18px 40px rgba(0,0,0,.45); }
+    .topbar.scrolled .nav { max-width: 1060px; padding: 0 14px 0 20px; height: 62px; border-radius: 999px; background: rgba(8,11,15,.82); -webkit-backdrop-filter: saturate(150%) blur(14px); backdrop-filter: saturate(150%) blur(14px); border-color: var(--line); box-shadow: 0 18px 40px rgba(0,0,0,.45); }
     .nav { position: relative; z-index: 3; display: flex; align-items: center; gap: 28px; height: 84px; padding: 0 28px; }
     .hero-spacer { height: 84px; }
     @media (max-width: 600px) { .topbar { top: 8px; left: 8px; right: 8px; } .topbar.scrolled { top: 6px; } }
