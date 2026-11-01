@@ -26,10 +26,9 @@
 
 ## 🎬 Tanıtım Videosu
 
-<!-- YouTube'a yükledikten sonra aşağıdaki linkleri video URL'leriyle değiştir. -->
-<a href="docs/media/mr-ducksafe-youtube.mp4"><img src="docs/media/thumbnail.png" alt="mr-ducksafe tanıtım videosu — yüzlerce CVE → birkaç aksiyon" width="720"></a>
+<a href="https://youtu.be/khb8hNfTLYg"><img src="docs/media/thumbnail.png" alt="mr-ducksafe tanıtım videosu — yüzlerce CVE → birkaç aksiyon" width="720"></a>
 
-- ▶️ **YouTube (1:59):** [docs/media/mr-ducksafe-youtube.mp4](docs/media/mr-ducksafe-youtube.mp4) — sorun, nasıl çalışır, canlı demo, CI kullanımı, gizlilik
+- ▶️ **YouTube (1:59):** [https://youtu.be/khb8hNfTLYg](https://youtu.be/khb8hNfTLYg) — sorun, nasıl çalışır, canlı demo, CI kullanımı, gizlilik
 - 📱 **Shorts (0:36, dikey):** [docs/media/mr-ducksafe-short.mp4](docs/media/mr-ducksafe-short.mp4)
 
 Videolar İngilizce seslendirmeli ve İngilizce ekran yazılıdır (terminal sahneleri İngilizce README'deki (`README.md`) gibi İngilizceye çevrilmiş çıktıyı gösterir). Hepsi kodla üretilir — bkz. [Tanıtım materyallerini yeniden üretmek](#tanıtım-materyallerini-yeniden-üretmek).

@@ -1,0 +1,143 @@
+1
+00:00:00,300 --> 00:00:04,576
+Every outdated app on your PC carries known
+security vulnerabilities.
+
+2
+00:00:04,726 --> 00:00:08,031
+Across a whole machine, that can easily add up
+to hundreds.
+
+3
+00:00:09,181 --> 00:00:15,484
+Chrome, AnyDesk, OneDrive, Adobe Reader. Every
+app stuck on an old version carries
+vulnerabilities
+
+4
+00:00:15,484 --> 00:00:17,799
+the whole world already knows about.
+
+5
+00:00:17,949 --> 00:00:20,808
+Tracking all of them by hand? Nobody wants that.
+
+6
+00:00:21,858 --> 00:00:27,259
+Meet mr-ducksafe: a free, open-source
+vulnerability scanner for the software installed
+
+7
+00:00:27,259 --> 00:00:27,949
+on Windows.
+
+8
+00:00:28,099 --> 00:00:31,173
+One single .exe. No install, no account.
+
+9
+00:00:32,423 --> 00:00:35,987
+First, it reads your installed programs from the
+Windows Registry.
+
+10
+00:00:36,137 --> 00:00:40,428
+Then it maps each one to an official product
+identifier, called a CPE.
+
+11
+00:00:40,578 --> 00:00:45,758
+Next, it queries the National Vulnerability
+Database for issues that affect the exact
+
+12
+00:00:45,758 --> 00:00:46,795
+version you have.
+
+13
+00:00:46,945 --> 00:00:51,078
+Finally, it explains the risk in plain language,
+and hands you the fix.
+
+14
+00:00:52,328 --> 00:00:53,944
+All it takes is one command.
+
+15
+00:00:55,328 --> 00:00:58,760
+A hundred and forty-three programs scanned.
+Twenty-one matched.
+
+16
+00:00:58,910 --> 00:01:03,587
+On this machine, that meant five hundred and
+twenty-five known vulnerabilities,
+
+17
+00:01:03,587 --> 00:01:07,375
+boiled down to just fourteen clear actions, most
+critical first.
+
+18
+00:01:08,525 --> 00:01:11,049
+The raw database entry is technical and long.
+
+19
+00:01:11,199 --> 00:01:16,205
+mr-ducksafe tells you what it actually means:
+the application can be hijacked through
+
+20
+00:01:16,205 --> 00:01:17,088
+a memory error.
+
+21
+00:01:17,238 --> 00:01:20,040
+And it gives you the fix: a single winget
+command.
+
+22
+00:01:21,290 --> 00:01:26,515
+Want every CVE for a single app? Filter by name,
+and switch on the detailed table.
+
+23
+00:01:28,854 --> 00:01:30,450
+It is built for CI, too.
+
+24
+00:01:30,600 --> 00:01:36,068
+If findings cross your fail-on threshold, it
+exits with code one, and the pipeline turns
+
+25
+00:01:36,068 --> 00:01:36,317
+red.
+
+26
+00:01:36,467 --> 00:01:38,728
+The full report is saved as JSON.
+
+27
+00:01:39,978 --> 00:01:43,109
+Every scan is stored in a local database on your
+machine.
+
+28
+00:01:43,259 --> 00:01:48,656
+Scanning is fully local. Only vendor, product
+and version ever leave your computer.
+
+29
+00:01:48,656 --> 00:01:49,631
+Zero telemetry.
+
+30
+00:01:50,881 --> 00:01:54,673
+Grab mr-ducksafe on GitHub, and start scanning
+with one command.
+
+31
+00:01:54,823 --> 00:01:57,399
+If you find it useful, give the project a star.
+

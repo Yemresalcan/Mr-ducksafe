@@ -4,8 +4,9 @@ Videos: [`mr-ducksafe-youtube.mp4`](mr-ducksafe-youtube.mp4) (1920×1080, 1:59) 
 [`mr-ducksafe-short.mp4`](mr-ducksafe-short.mp4) (1080×1920, 0:36) ·
 Thumbnail: [`thumbnail.png`](thumbnail.png) (1280×720)
 
-After uploading, replace the `docs/media/*.mp4` links in the "Promo Video /
-Tanıtım Videosu" section of `README.md` and `README.tr.md` with the YouTube URLs.
+YouTube: https://youtu.be/khb8hNfTLYg (linked from both READMEs).
+Subtitles: [`mr-ducksafe-youtube.en.srt`](mr-ducksafe-youtube.en.srt) · [`mr-ducksafe-short.en.srt`](mr-ducksafe-short.en.srt)
+— upload them under Subtitles → English → Upload file → "With timing".
 
 Narration: Kokoro-82M, voice `af_heart` (Apache-2.0). Music and sound effects
 are synthesized in code, so there is nothing to credit or license.

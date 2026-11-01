@@ -1,0 +1,35 @@
+1
+00:00:00,200 --> 00:00:02,417
+How many security holes are on your PC?
+
+2
+00:00:02,567 --> 00:00:04,178
+It can easily be hundreds.
+
+3
+00:00:05,328 --> 00:00:07,535
+One command: mr-ducksafe scan.
+
+4
+00:00:07,685 --> 00:00:09,792
+A hundred and forty-three programs scanned.
+
+5
+00:00:09,942 --> 00:00:15,275
+On this PC: five hundred and twenty-five
+vulnerabilities. But only fourteen actions.
+
+6
+00:00:17,550 --> 00:00:21,647
+No jargon. It tells you the risk in plain words,
+and gives you the fix.
+
+7
+00:00:23,250 --> 00:00:28,938
+A single .exe, official NVD data, CI support,
+and one hundred percent local.
+
+8
+00:00:30,088 --> 00:00:32,828
+Free and open source. Link in the description.
+
