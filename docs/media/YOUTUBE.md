@@ -5,7 +5,7 @@ Videos: [`mr-ducksafe-youtube.mp4`](mr-ducksafe-youtube.mp4) (1920×1080, 1:58) 
 Thumbnail: [`thumbnail.png`](thumbnail.png) (1280×720)
 
 After uploading, replace the `docs/media/*.mp4` links in the "Promo Video /
-Tanıtım Videosu" section of `README.en.md` and `README.md` with the YouTube URLs.
+Tanıtım Videosu" section of `README.md` and `README.tr.md` with the YouTube URLs.
 
 Narration: Kokoro-82M, voice `af_heart` (Apache-2.0). Music and sound effects
 are synthesized in code, so there is nothing to credit or license.

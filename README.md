@@ -2,11 +2,11 @@
 
 # 🦆 mr-ducksafe
 
-**Windows kurulu yazılımları için NVD CVE tarayıcı — tek binary, terminalden.**
+**NVD CVE scanner for Windows-installed software — single binary, straight from the terminal.**
 
-500+ CVE değil → ~10 aksiyon maddesi. Risk insan dilinde, çözüm tek komut.
+Not 500+ CVEs → ~10 action items. Risk in plain language, fix in one command.
 
-**🇹🇷 Türkçe** · [🇬🇧 English](README.en.md)
+**🇬🇧 English** · [🇹🇷 Türkçe](README.tr.md)
 
 [![CI](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/ci.yml/badge.svg)](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/ci.yml)
 [![Release](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/release.yml/badge.svg)](https://github.com/yemresalcan/mr-ducksafe/actions/workflows/release.yml)
@@ -18,96 +18,96 @@
 
 <br>
 
-<img src="docs/demo.gif" alt="mr-ducksafe canlı demo — scan / --app / history / --fail-on" width="960">
+<img src="docs/demo.gif" alt="mr-ducksafe live demo — scan / --app / history / --fail-on" width="960">
 
 </div>
 
 ---
 
-## 🎬 Tanıtım Videosu
+## 🎬 Promo Video
 
-<!-- YouTube'a yükledikten sonra aşağıdaki linkleri video URL'leriyle değiştir. -->
-<a href="docs/media/mr-ducksafe-youtube.mp4"><img src="docs/media/thumbnail.png" alt="mr-ducksafe tanıtım videosu — 525 CVE → 14 aksiyon" width="720"></a>
+<!-- After uploading to YouTube, replace the links below with the video URLs. -->
+<a href="docs/media/mr-ducksafe-youtube.mp4"><img src="docs/media/thumbnail.png" alt="mr-ducksafe promo video — 525 CVEs → 14 actions" width="720"></a>
 
-- ▶️ **YouTube (1:58):** [docs/media/mr-ducksafe-youtube.mp4](docs/media/mr-ducksafe-youtube.mp4) — sorun, nasıl çalışır, canlı demo, CI kullanımı, gizlilik
-- 📱 **Shorts (0:37, dikey):** [docs/media/mr-ducksafe-short.mp4](docs/media/mr-ducksafe-short.mp4)
+- ▶️ **YouTube (1:58):** [docs/media/mr-ducksafe-youtube.mp4](docs/media/mr-ducksafe-youtube.mp4) — the problem, how it works, live demo, CI usage, privacy
+- 📱 **Shorts (0:37, vertical):** [docs/media/mr-ducksafe-short.mp4](docs/media/mr-ducksafe-short.mp4)
 
-Videolar İngilizce seslendirmeli ve İngilizce ekran yazılıdır (terminal sahneleri `README.en.md`'deki gibi İngilizceye çevrilmiş çıktıyı gösterir). Hepsi kodla üretilir — bkz. [Tanıtım materyallerini yeniden üretmek](#tanıtım-materyallerini-yeniden-üretmek).
-
----
-
-## Neden?
-
-Bilgisayarındaki Adobe Acrobat, Chrome, Office, Java... bunların **eski sürümlerinde** ciddi güvenlik açıkları var. Kimse manuel takip etmek istemez. `mr-ducksafe` bunu otomatikleştirir:
-
-- 🔍 **Tek `.exe`** — kurulum, runtime, hesap yok
-- 🌐 **Doğru veri kaynağı:** [NVD CVE API 2.0](https://nvd.nist.gov/) (resmi, CPE tabanlı, masaüstü için ideal)
-- 📊 **Rehberli özet:** uygulama bazında gruplu, severity'ye göre sıralı
-- 🧠 **İnsan dilinde risk:** "Use-after-free in XSLT" değil → "bellek hatası yoluyla uygulama ele geçirilebilir"
-- 🛠️ **Aksiyon odaklı:** her bulgu için `winget upgrade` veya güncelleme linki
-- 🗂️ **Lokal geçmiş:** her tarama SQLite'a yazılır, `history` ile erişilir
-- ⚙️ **CI dostu:** `--format=json`, `--output FILE`, `--fail-on=high`, `NO_COLOR` desteği
-- 🔒 **Gizlilik:** tarama tamamen lokal; sadece anonim `{vendor, product, version}` NVD'ye gider
-
-**Platform:** Windows. Linux/macOS v0.2'de planlanıyor.
+Both videos are narrated in English. They and the thumbnail are generated in code from the scan output in `scripts/demo/` — see [Regenerating the promo material](#regenerating-the-promo-material).
 
 ---
 
-## Nasıl Çalışır?
+## Why?
+
+The Adobe Acrobat, Chrome, Office, Java... on your machine — their **old versions** carry serious security vulnerabilities. Nobody wants to track them manually. `mr-ducksafe` automates exactly that:
+
+- 🔍 **Single `.exe`** — no install, no runtime, no account
+- 🌐 **The right data source:** [NVD CVE API 2.0](https://nvd.nist.gov/) (official, CPE-based, ideal for desktop)
+- 📊 **Guided summary:** grouped per application, sorted by severity
+- 🧠 **Risk in plain language:** not "Use-after-free in XSLT" → "the application can be hijacked through a memory error"
+- 🛠️ **Action-oriented:** a `winget upgrade` or update link for every finding
+- 🗂️ **Local history:** every scan is written to SQLite, accessed with `history`
+- ⚙️ **CI-friendly:** `--format=json`, `--output FILE`, `--fail-on=high`, `NO_COLOR` support
+- 🔒 **Privacy:** scanning is fully local; only anonymous `{vendor, product, version}` goes to NVD
+
+**Platform:** Windows. Linux/macOS planned for v0.2.
+
+---
+
+## How It Works
 
 ```
- 1. Tara            2. Eşleştir           3. Sorgula               4. Açıkla
- Windows Registry → 50 hazır mapping   → NVD CVE API 2.0       → sade dilde risk
- (kurulu programlar)  ile ad → CPE        (CPE + sürüm aralığı)    + winget / güncelleme linki
-   143 program          21 eşleşme          525 CVE                  14 aksiyon
+ 1. Scan             2. Match              3. Query                 4. Explain
+ Windows Registry → 50 curated mappings → NVD CVE API 2.0       → plain-language risk
+ (installed apps)     name → CPE            (CPE + version range)    + winget / update link
+   143 apps             21 matches          525 CVEs                 14 action items
 ```
 
-1. **Tara** — `HKLM`/`HKCU` Uninstall anahtarlarından kurulu yazılımların adı, sürümü ve yayıncısı okunur.
-2. **Eşleştir** — Her program, [`mappings.yaml`](internal/matcher/data/mappings.yaml) içindeki kurallarla (tam ad veya regex) bir **CPE** kimliğine bağlanır. Eşleşmeyenler `--show-unmatched` ile görülebilir.
-3. **Sorgula** — Eşleşen her CPE için NVD'ye istek atılır; CVE'lerin etkilenen sürüm aralıkları kurulu sürümle karşılaştırılır.
-4. **Açıkla** — Bulgular uygulama bazında gruplanır, en ciddi olan üstte olacak şekilde sıralanır; her grup için aciliyet, sade dilde risk ve çözüm komutu üretilir.
+1. **Scan** — name, version and publisher of installed software are read from the `HKLM`/`HKCU` Uninstall keys.
+2. **Match** — each program is linked to a **CPE** identifier using the rules (exact name or regex) in [`mappings.yaml`](internal/matcher/data/mappings.yaml). Unmatched programs can be listed with `--show-unmatched`.
+3. **Query** — NVD is queried for every matched CPE; each CVE's affected version ranges are compared with the installed version.
+4. **Explain** — findings are grouped per application and sorted most-severe first; each group gets an urgency, a plain-language risk and a fix command.
 
-### Hız ve rate limit
+### Speed and rate limits
 
-| | İstek limiti (NVD) | Tipik tarama (~20 eşleşme) |
+| | NVD request limit | Typical scan (~20 matches) |
 |---|---|---|
-| `NVD_API_KEY` yok | 5 istek / 30 sn (~6 sn aralık) | ~2 dakika |
-| `NVD_API_KEY` var | 50 istek / 30 sn (~0.7 sn aralık) | ~15–20 saniye |
+| no `NVD_API_KEY` | 5 requests / 30 s (~6 s apart) | ~2 minutes |
+| with `NVD_API_KEY` | 50 requests / 30 s (~0.7 s apart) | ~15–20 seconds |
 
-Aynı `{CPE, sürüm}` sorgusu tek tarama içinde tekrar atılmaz (bellek içi cache).
+The same `{CPE, version}` query is never sent twice within one scan (in-memory cache).
 
 ---
 
-## Kurulum
+## Installation
 
-### Hazır binary (önerilen)
+### Prebuilt binary (recommended)
 
-[GitHub Releases](https://github.com/yemresalcan/mr-ducksafe/releases) üzerinden işletim sistemine uygun arşivi indir, `mr-ducksafe.exe` (veya `mr-ducksafe`) dosyasını PATH'e koy.
+Download the archive matching your OS from [GitHub Releases](https://github.com/yemresalcan/mr-ducksafe/releases) and put the `mr-ducksafe.exe` (or `mr-ducksafe`) file on your PATH.
 
-Her release için **SHA256 checksum** ve **SBOM** (`*.sbom.json`, CycloneDX) yayınlanıyor.
+Every release ships with a **SHA256 checksum** and an **SBOM** (`*.sbom.json`, CycloneDX).
 
 ### Scoop (Windows)
 
 ```powershell
-# Manifest URL ile direkt kurulum (bucket gerekmez):
+# Direct install via manifest URL (no bucket required):
 scoop install https://github.com/yemresalcan/mr-ducksafe/releases/latest/download/mr-ducksafe.json
 ```
 
-> Scoop manifest sonraki sürümde release artifact'i olarak yayınlanacak.
+> The Scoop manifest will ship as a release artifact in the next version.
 
 ### `go install`
 
-Go 1.25+ kuruluysa tek komut:
+With Go 1.25+ installed, one command:
 
 ```sh
 go install github.com/yemresalcan/mr-ducksafe/cmd/mr-ducksafe@latest
 ```
 
-> Binary `%USERPROFILE%\go\bin` (veya `$GOPATH/bin`) altına kurulur; bu klasörün PATH'te olduğundan emin ol.
+> The binary lands in `%USERPROFILE%\go\bin` (or `$GOPATH/bin`); make sure that folder is on your PATH.
 
-### Kaynaktan build
+### Build from source
 
-Go 1.25+ gerekli.
+Requires Go 1.25+.
 
 ```sh
 git clone https://github.com/yemresalcan/mr-ducksafe
@@ -115,110 +115,110 @@ cd mr-ducksafe
 go build -o mr-ducksafe.exe ./cmd/mr-ducksafe
 ```
 
-### NVD API key (önerilen — 10x hızlı)
+### NVD API key (recommended — 10x faster)
 
-[Ücretsiz key al](https://nvd.nist.gov/developers/request-an-api-key), sonra:
+[Get a free key](https://nvd.nist.gov/developers/request-an-api-key), then:
 
 ```powershell
 setx NVD_API_KEY "<key>"
 ```
-> Yeni terminal aç. `setx` mevcut oturumu etkilemez.
+> Open a new terminal. `setx` does not affect the current session.
 
-### Kaldırma
+### Uninstall
 
-`mr-ducksafe.exe` dosyasını ve tarama geçmişinin tutulduğu `%USERPROFILE%\.mr-ducksafe\` klasörünü silmen yeterli. Registry'ye veya sisteme başka bir şey yazılmaz.
+Delete `mr-ducksafe.exe` and the `%USERPROFILE%\.mr-ducksafe\` folder that holds scan history. Nothing else is written to the registry or the system.
 
 ---
 
-## Hızlı Kullanım
+## Quick Usage
 
 ```sh
-mr-ducksafe scan                       # rehberli özet
-mr-ducksafe scan --details             # tüm CVE tablosu
-mr-ducksafe scan --app "Chrome"        # sadece Chrome
-mr-ducksafe scan -o report.json --format=json  # CI/script için dosyaya yaz
-mr-ducksafe scan --fail-on=high        # high+ bulgu → exit 1 (CI)
-mr-ducksafe history                    # geçmiş tarama kayıtları
-mr-ducksafe prune --older-than=30d     # eski kayıtları sil
+mr-ducksafe scan                       # guided summary
+mr-ducksafe scan --details             # full CVE table
+mr-ducksafe scan --app "Chrome"        # Chrome only
+mr-ducksafe scan -o report.json --format=json  # write to file for CI/scripts
+mr-ducksafe scan --fail-on=high        # high+ finding → exit 1 (CI)
+mr-ducksafe history                    # past scan records
+mr-ducksafe prune --older-than=30d     # delete old records
 ```
 
 ---
 
-## Örnek Çıktı
+## Sample Output
 
 ```
-mr-ducksafe — güncellenmesi gereken 14 yazılım (521 açık)
+mr-ducksafe — 14 applications need updating (521 vulnerabilities)
 
-  KRIT  Google Chrome  148.0.7778.179
-          1 kritik · 1 yüksek · 6 orta · 4 düşük
-          Aciliyet: Acilen güncelle — aktif sömürülebilir.
-          Risk:     Bellek hatası yoluyla uygulama ele geçirilebilir.
-          Çözüm:    winget upgrade --id Google.Chrome
+  CRIT  Google Chrome  148.0.7778.179
+          1 critical · 1 high · 6 medium · 4 low
+          Urgency: Update immediately — actively exploitable.
+          Risk:    The application can be hijacked through a memory error.
+          Fix:     winget upgrade --id Google.Chrome
 
-  KRIT  AnyDesk  ad 9.6.1
-          3 kritik · 6 yüksek · 1 orta
-          Aciliyet: Acilen güncelle — aktif sömürülebilir.
-          Risk:     Uzaktan, internet üzerinden bilgisayarınızda kod çalıştırılabilir.
-          Çözüm:    Uygulamayı en son sürüme güncelleyin.
+  CRIT  AnyDesk  ad 9.6.1
+          3 critical · 6 high · 1 medium
+          Urgency: Update immediately — actively exploitable.
+          Risk:    Code can be executed on your computer remotely, over the internet.
+          Fix:     Update the application to the latest version.
 
-  KRIT  Microsoft OneDrive  26.078.0426.0002
-          1 kritik · 6 yüksek · 2 orta
-          Aciliyet: Acilen güncelle — aktif sömürülebilir.
-          Risk:     Saldırgan sistemdeki yetkilerini yükseltebilir.
-          Çözüm:    Uygulamayı en son sürüme güncelleyin.
+  CRIT  Microsoft OneDrive  26.078.0426.0002
+          1 critical · 6 high · 2 medium
+          Urgency: Update immediately — actively exploitable.
+          Risk:    An attacker can elevate their privileges on the system.
+          Fix:     Update the application to the latest version.
 
-  KRIT  Node.js  22.17.0
-          1 kritik · 3 yüksek · 1 orta
-          Aciliyet: Acilen güncelle — aktif sömürülebilir.
-          Risk:     Uzaktan, internet üzerinden bilgisayarınızda kod çalıştırılabilir.
-          Çözüm:    winget upgrade --id OpenJS.NodeJS
+  CRIT  Node.js  22.17.0
+          1 critical · 3 high · 1 medium
+          Urgency: Update immediately — actively exploitable.
+          Risk:    Code can be executed on your computer remotely, over the internet.
+          Fix:     winget upgrade --id OpenJS.NodeJS
 
-  YÜKS  Adobe Acrobat Reader DC - Turkish  20.012.20043
-          247 yüksek · 135 orta · 27 düşük
-          Aciliyet: Yakında güncelle — ciddi risk.
-          Risk:     Uzaktan, internet üzerinden bilgisayarınızda kod çalıştırılabilir.
-          Çözüm:    winget upgrade --id Adobe.Acrobat.Reader.64-bit
+  HIGH  Adobe Acrobat Reader DC - Turkish  20.012.20043
+          247 high · 135 medium · 27 low
+          Urgency: Update soon — serious risk.
+          Risk:    Code can be executed on your computer remotely, over the internet.
+          Fix:     winget upgrade --id Adobe.Acrobat.Reader.64-bit
 
   ...
 
-  Detay:  mr-ducksafe scan --details        (tüm CVE listesi)
-          mr-ducksafe scan --app "<isim>"   (tek uygulama)
+  Details:  mr-ducksafe scan --details        (full CVE list)
+            mr-ducksafe scan --app "<name>"   (single application)
 ```
 
-> **Eski Adobe Acrobat'ın 409 açığının çoğu gerçektir** — 2020 sürümünden beri güncellenmediği için. Araç tam da bunu yakalamalı.
+> **Most of the 409 vulnerabilities in that old Adobe Acrobat are real** — because it hasn't been updated since its 2020 release. This is exactly what the tool should catch.
 
 ---
 
-## Komutlar
+## Commands
 
-### `scan` — taramayı çalıştır
+### `scan` — run the scan
 
 ```
 $ mr-ducksafe scan --help
 
-Kurulu yazılımları tarayıp CVE raporu üret
+Scan installed software and produce a CVE report
 
 Flags:
-      --app string       sadece adı bu metni içeren uygulamayı göster
-      --details          özet yerine tüm CVE'leri tablo halinde göster
-      --fail-on string   eşik aşıldığında exit 1: critical | high | medium | low
-      --format string    çıktı formatı: table | json | markdown (default "table")
-  -o, --output string    raporu bu dosyaya yaz (varsayılan: stdout)
-      --show-unmatched   eşleştirilemeyen yazılımları da göster
+      --app string       only show applications whose name contains this text
+      --details          show all CVEs as a table instead of the summary
+      --fail-on string   exit 1 when threshold is crossed: critical | high | medium | low
+      --format string    output format: table | json | markdown (default "table")
+  -o, --output string    write the report to this file (default: stdout)
+      --show-unmatched   also show software that could not be matched
 ```
 
-### `history` — geçmiş taramaları listele
+### `history` — list past scans
 
 ```
 $ mr-ducksafe history --limit 5
 
-ID  Tarih                Durum    Süre  Bulgu
+ID  Date                 Status   Time  Findings
 12  2026-06-03 14:21:08  success  18s   521
 11  2026-06-02 09:14:22  success  21s   519
 10  2026-06-01 18:02:11  failed   4s    -
 ```
 
-### `prune` — eski kayıtları sil
+### `prune` — delete old records
 
 ```sh
 mr-ducksafe prune --older-than=30d
@@ -231,74 +231,74 @@ $ mr-ducksafe version
 mr-ducksafe v0.1.0
 ```
 
-### Global flag'ler
+### Global flags
 
-| Flag | Açıklama |
+| Flag | Description |
 |---|---|
-| `--db PATH` | SQLite DB yolu (default: `~/.mr-ducksafe/mr-ducksafe.db`) |
-| `--no-color` | Renkli çıktıyı kapat (`NO_COLOR` env de onurlandırılır) |
-| `--verbose` | Ayrıntılı log |
+| `--db PATH` | SQLite DB path (default: `~/.mr-ducksafe/mr-ducksafe.db`) |
+| `--no-color` | Disable colored output (`NO_COLOR` env is also honored) |
+| `--verbose` | Detailed logging |
 
 ---
 
-## Exit Code'ları
+## Exit Codes
 
-| Code | Anlam |
+| Code | Meaning |
 |---|---|
-| 0 | Başarılı, `--fail-on` eşiği aşılmadı |
-| 1 | Eşik aşıldı (`--fail-on`) veya CLI hatası |
-| 2 | Tarama hatası (NVD erişilemedi, scanner başarısız) |
+| 0 | Success, `--fail-on` threshold not crossed |
+| 1 | Threshold crossed (`--fail-on`) or CLI error |
+| 2 | Scan error (NVD unreachable, scanner failed) |
 
 ---
 
-## Gizlilik
+## Privacy
 
-- Tarama tamamen **lokal**.
-- NVD'ye giden tek istek: `GET ?virtualMatchString=cpe:2.3:a:vendor:product` (HTTPS).
-- Makine adı, kullanıcı bilgisi, IP **içermez**.
-- Sonuçlar `~/.mr-ducksafe/mr-ducksafe.db` içinde lokal SQLite'ta.
-- Hiçbir telemetri yok.
+- Scanning is fully **local**.
+- The only request that goes to NVD: `GET ?virtualMatchString=cpe:2.3:a:vendor:product` (HTTPS).
+- It **does not** include machine name, user info, or IP.
+- Results live in a local SQLite database at `~/.mr-ducksafe/mr-ducksafe.db`.
+- No telemetry whatsoever.
 
 ---
 
-## Mimari (özet)
+## Architecture (overview)
 
 ```
 cmd/mr-ducksafe ──► internal/cmd (Cobra: scan/history/prune/version)
                          │
                          ▼
-                  internal/scanengine ──► orkestrasyon (goroutine + semaphore)
+                  internal/scanengine ──► orchestration (goroutine + semaphore)
                          │
         ┌────────────────┼────────────────┬────────────────┐
         ▼                ▼                ▼                ▼
    internal/      internal/        internal/        internal/
     scanner        matcher          vuln             store
-   (Win Reg)    (50 mapping)      (Client iface)    (SQLite)
+   (Win Reg)    (50 mappings)     (Client iface)    (SQLite)
                                        ├─ nvd       (~/.mr-ducksafe/...)
                                        └─ osv
 
-                  internal/report  ──► table | json | markdown | özet
-                  internal/advice  ──► severity + keyword → risk metni
+                  internal/report  ──► table | json | markdown | summary
+                  internal/advice  ──► severity + keyword → risk text
                   internal/tui     ──► banner + spinner
 ```
 
-**Anahtar prensip:** Veri kaynağı (`vuln.Client`) interface arkasında. NVD ve OSV ikisi de implement eder, scanengine fark etmez.
+**Key principle:** the data source (`vuln.Client`) sits behind an interface. NVD and OSV both implement it, and scanengine doesn't care which one.
 
 ---
 
-## CI/CD'de Kullanım
+## Using It in CI/CD
 
-`--fail-on` eşiği aşıldığında süreç **exit 1** ile biter; bu yüzden pipeline'ı doğrudan kırmızıya çevirir. Örnek GitHub Actions iş akışı (Windows runner üzerinde haftalık tarama + JSON raporu artifact olarak saklama):
+When the `--fail-on` threshold is crossed the process exits with **code 1**, so it turns a pipeline red on its own. Example GitHub Actions workflow (weekly scan on a Windows runner, JSON report kept as an artifact):
 
 ```yaml
 # .github/workflows/cve-scan.yml
 name: cve-scan
 on:
-  schedule: [{ cron: "0 6 * * 1" }]   # her pazartesi 06:00 UTC
+  schedule: [{ cron: "0 6 * * 1" }]   # every Monday 06:00 UTC
   workflow_dispatch:
 jobs:
   scan:
-    runs-on: windows-latest            # veya kendi self-hosted Windows runner'ın
+    runs-on: windows-latest            # or your own self-hosted Windows runner
     steps:
       - uses: actions/setup-go@v5
         with: { go-version: "1.25" }
@@ -311,11 +311,11 @@ jobs:
         with: { name: cve-report, path: report.json }
 ```
 
-> Asıl değer, **kendi makinelerini** tarayan self-hosted runner'larda veya zamanlanmış görevlerde (Task Scheduler) ortaya çıkar; GitHub'ın hazır runner'ı yalnızca kendi imajını tarar.
+> The real value shows up on self-hosted runners or scheduled tasks (Task Scheduler) that scan **your own machines**; a GitHub-hosted runner only scans its own image.
 
-### JSON çıktı şeması
+### JSON output schema
 
-`--format=json` ile üretilen rapor (`schemaVersion: "1"`):
+Report produced by `--format=json` (`schemaVersion: "1"`):
 
 ```json
 {
@@ -341,148 +341,148 @@ jobs:
 ```
 
 - `severity`: `critical` · `high` · `medium` · `low` (· `unknown`)
-- `fixedVersion` ve `references` yalnızca veri kaynağı bu bilgiyi verdiğinde bulunur (boşsa alan hiç yazılmaz).
-- `warnings` yalnızca kısmi hatalarda (örn. tek bir NVD isteği başarısız olduğunda) bulunur.
-- `--format=markdown` ise PR yorumu / wiki için hazır bir tablo üretir.
+- `fixedVersion` and `references` appear only when the data source provides them (empty fields are omitted).
+- `warnings` appears only on partial failures (e.g. a single NVD request failed).
+- `--format=markdown` produces a table ready for a PR comment or wiki page.
 
 ---
 
-## Desteklenen Uygulamalar (50)
+## Supported Applications (50)
 
 <details>
-<summary>Listeyi göster</summary>
+<summary>Show the list</summary>
 
-| Kategori | Uygulamalar |
+| Category | Applications |
 |---|---|
-| Tarayıcılar | Google Chrome · Mozilla Firefox · Microsoft Edge · Opera · Brave · Vivaldi |
-| Ofis, PDF, e-posta | Microsoft Office · Adobe Acrobat Reader · LibreOffice · Thunderbird |
-| Geliştirici araçları | Python 3 · Node.js · Git · Java (JRE) · Java SE Development Kit · Visual Studio Code · IntelliJ IDEA · PyCharm · GoLand · WebStorm · Docker Desktop · Postman · MySQL Workbench · OpenSSL |
-| İletişim ve bulut | Discord · Slack · Zoom · Microsoft Teams · Microsoft OneDrive |
-| Uzak erişim, ağ, dosya transferi | TeamViewer · AnyDesk · PuTTY · FileZilla Client · WinSCP · Wireshark · OpenVPN |
-| Medya ve tasarım | VLC media player · OBS Studio · Spotify · Steam · Adobe Photoshop · Adobe Illustrator · Adobe Premiere Pro · GIMP · Inkscape · Blender · Audacity |
-| Araçlar | 7-Zip · Notepad++ · WinRAR |
+| Browsers | Google Chrome · Mozilla Firefox · Microsoft Edge · Opera · Brave · Vivaldi |
+| Office, PDF, email | Microsoft Office · Adobe Acrobat Reader · LibreOffice · Thunderbird |
+| Developer tools | Python 3 · Node.js · Git · Java (JRE) · Java SE Development Kit · Visual Studio Code · IntelliJ IDEA · PyCharm · GoLand · WebStorm · Docker Desktop · Postman · MySQL Workbench · OpenSSL |
+| Communication & cloud | Discord · Slack · Zoom · Microsoft Teams · Microsoft OneDrive |
+| Remote access, network, file transfer | TeamViewer · AnyDesk · PuTTY · FileZilla Client · WinSCP · Wireshark · OpenVPN |
+| Media & design | VLC media player · OBS Studio · Spotify · Steam · Adobe Photoshop · Adobe Illustrator · Adobe Premiere Pro · GIMP · Inkscape · Blender · Audacity |
+| Utilities | 7-Zip · Notepad++ · WinRAR |
 
-Kaynak: [`internal/matcher/data/mappings.yaml`](internal/matcher/data/mappings.yaml). Listede olmayan bir uygulama için [yeni mapping](#katkı-yeni-mapping-eklemek) PR'ı açabilirsin.
+Source: [`internal/matcher/data/mappings.yaml`](internal/matcher/data/mappings.yaml). Missing an app? Open a [new mapping](#contributing-adding-a-new-mapping) PR.
 
 </details>
 
 ---
 
-## SSS / Sorun Giderme
+## FAQ / Troubleshooting
 
-**Tarama çok yavaş.**
-`NVD_API_KEY` tanımlı değilse NVD 30 saniyede yalnızca 5 isteğe izin verir. Ücretsiz key ile ~10 kat hızlanır (bkz. [NVD API key](#nvd-api-key-önerilen--10x-hızlı)).
+**The scan is very slow.**
+Without `NVD_API_KEY`, NVD allows only 5 requests per 30 seconds. A free key makes it ~10x faster (see [NVD API key](#nvd-api-key-recommended--10x-faster)).
 
-**Bir uygulamam raporda yok.**
-Muhtemelen eşleştirilemedi. `mr-ducksafe scan --show-unmatched` ile kontrol et; listede yoksa bir mapping PR'ı ya da [yeni mapping issue'su](.github/ISSUE_TEMPLATE/new_mapping.yml) aç.
+**One of my applications is missing from the report.**
+It probably could not be matched. Check with `mr-ducksafe scan --show-unmatched`; if it is listed there, open a mapping PR or a [new mapping issue](.github/ISSUE_TEMPLATE/new_mapping.yml).
 
-**"Çözüm" satırı "Uygulamayı en son sürüme güncelleyin" diyor, `winget` komutu yok.**
-O uygulama için mapping'de `winget_id` tanımlı değil. Tanımlıysa tek komutla güncelleyebilirsin.
+**The "Fix" line says "Update the application to the latest version" instead of a `winget` command.**
+That application's mapping has no `winget_id` yet. When it does, you can update with one command.
 
-**Bazı CVE'ler çok eski görünüyor (2008, 2012...).**
-NVD bu kayıtları ilgili CPE'nin *tüm* sürümleri için etkilenmiş olarak işaretliyor (çoğu protokol seviyesi açık: TLS, SPDY vb.). Özet görünüm bunları gruplar; `--details` ham listeyi gösterir.
+**Some CVEs look very old (2008, 2012...).**
+NVD flags these for *all* versions of the CPE (mostly protocol-level issues: TLS, SPDY, etc.). The summary view groups them; `--details` shows the raw list.
 
-**Windows SmartScreen uyarı veriyor.**
-Release binary'leri henüz kod imzalı değil. İndirdiğin arşivin SHA256 değerini `checksums.txt` ile doğrulayıp "Ek bilgi → Yine de çalıştır" diyebilirsin.
+**Windows SmartScreen shows a warning.**
+Release binaries are not code-signed yet. Verify the archive's SHA256 against `checksums.txt`, then choose "More info → Run anyway".
 
-**Linux/macOS'ta `scanner: bu işletim sistemi henüz desteklenmiyor` hatası.**
-Release'te Linux/macOS binary'leri de var ama yazılım tarayıcısı şu an yalnızca Windows Registry'yi okuyor. dpkg/rpm/Homebrew desteği v0.2'de.
+**`scanner: bu işletim sistemi henüz desteklenmiyor` (OS not supported) on Linux/macOS.**
+Linux/macOS binaries are published, but the software scanner currently only reads the Windows Registry. dpkg/rpm/Homebrew support is planned for v0.2.
 
-**Exit kodu 2 aldım.**
-Tarama hatası: çoğunlukla NVD'ye ulaşılamadı (ağ, proxy, NVD bakımı). Nedeni stderr'de `scan failed: ...` satırında yazar.
-
----
-
-## Bilinen Sınırlamalar (MVP)
-
-- **50 uygulama mapping'i** — top yazılımları kapsar; geri kalan "eşleştirilemedi" görünür. Topluluk PR'larıyla genişler.
-- **Versiyon şeması farklı uygulamalarda** "Düzeltme" sütunu boş kalabilir (NVD `versionEndIncluding` kullandığında — Adobe gibi).
-- **Sadece kategori-bazlı öğreticilik (Seviye A):** Her CVE için değil, severity + anahtar kelimeden türeyen açıklamalar. LLM destekli Seviye B v0.2'de planlanıyor.
-- **Build numarası kullanan apps** (örn. eski JetBrains) için `version_from_name` regex'i `mappings.yaml`'a eklenmeli (örnek mevcut).
+**I got exit code 2.**
+Scan error — usually NVD was unreachable (network, proxy, NVD maintenance). The cause is printed to stderr on the `scan failed: ...` line.
 
 ---
 
-## Geliştirme
+## Known Limitations (MVP)
+
+- **50 application mappings** — covers top software; the rest show up as "unmatched". Grows through community PRs.
+- **Version schemes vary across applications** — the "Fix" column may stay empty (when NVD uses `versionEndIncluding` — like Adobe).
+- **Category-based education only (Level A):** explanations derived from severity + keyword, not per individual CVE. LLM-assisted Level B planned for v0.2.
+- **Apps using build numbers** (e.g. older JetBrains) need a `version_from_name` regex added to `mappings.yaml` (example provided).
+
+---
+
+## Development
 
 ```sh
-go test ./... -race                     # tüm testler
+go test ./... -race                     # all tests
 go test ./... -coverprofile=cover.out   # coverage
 golangci-lint run                       # lint
 
-# Lokal cross-platform release smoke (goreleaser kurulu olmalı)
+# Local cross-platform release smoke (goreleaser must be installed)
 goreleaser release --snapshot --clean
 
-# Manuel cross-platform build
+# Manual cross-platform build
 .\scripts\build.ps1 -Version "0.1.0"
 ./scripts/build.sh 0.1.0
 ```
 
-### Tanıtım materyallerini yeniden üretmek
+### Regenerating the promo material
 
-README'deki thumbnail ve `docs/media/` altındaki videolar kodla üretilir (Python 3.10+, Pillow, numpy, ffmpeg gerekir):
+The README thumbnail and the videos under `docs/media/` are generated in code (requires Python 3.10+, Pillow, numpy, ffmpeg):
 
 ```sh
-python scripts/video/render_video.py              # thumbnail + YouTube + Shorts
-python scripts/video/render_video.py thumbnail    # sadece thumbnail
-python scripts/video/render_video.py preview short  # birkaç kare önizleme
+python scripts/video/render_video.py                # thumbnail + YouTube + Shorts
+python scripts/video/render_video.py thumbnail      # thumbnail only
+python scripts/video/render_video.py preview short  # a few preview frames
 ```
 
-Terminal sahneleri gerçek tarama çıktılarının (`scripts/demo/*.txt`) İngilizce karşılıklarından (`scripts/demo/en/`) beslenir; müzik ve efektler numpy ile sentezlenir (telif riski yok). Seslendirme yerel çalışan [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) (Apache-2.0) ile yapılır: `pip install kokoro-onnx`, ardından [onnx-community/Kokoro-82M-v1.0-ONNX](https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX)'ten `onnx/model.onnx` ve `voices/af_heart.bin` dosyalarını indirip `KOKORO_MODEL` / `KOKORO_VOICES` ile göster (ayrıntı script'in başında). Seslendirmesiz üretmek için `DUCKSAFE_TTS=off`. YouTube başlık/açıklama/bölüm metinleri: [docs/media/YOUTUBE.md](docs/media/YOUTUBE.md).
+Terminal scenes use English translations (`scripts/demo/en/`) of the real scan output in `scripts/demo/*.txt`; music and sound effects are synthesized with numpy (no licensing issues). Narration runs locally with [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) (Apache-2.0): `pip install kokoro-onnx`, then download `onnx/model.onnx` and `voices/af_heart.bin` from [onnx-community/Kokoro-82M-v1.0-ONNX](https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX) and point `KOKORO_MODEL` / `KOKORO_VOICES` at them (details at the top of the script). Set `DUCKSAFE_TTS=off` to render without narration. YouTube title/description/chapter text: [docs/media/YOUTUBE.md](docs/media/YOUTUBE.md).
 
-**Dokümanlar:**
-- Tasarım: [docs/superpowers/specs/2026-05-23-mr-ducksafe-design.md](docs/superpowers/specs/2026-05-23-mr-ducksafe-design.md)
+**Documents:**
+- Design: [docs/superpowers/specs/2026-05-23-mr-ducksafe-design.md](docs/superpowers/specs/2026-05-23-mr-ducksafe-design.md)
 - CLI-only pivot: [docs/superpowers/specs/2026-06-03-cli-only-pivot-design.md](docs/superpowers/specs/2026-06-03-cli-only-pivot-design.md)
-- Implementasyon planı: [docs/superpowers/plans/2026-05-24-mr-ducksafe-mvp.md](docs/superpowers/plans/2026-05-24-mr-ducksafe-mvp.md)
+- Implementation plan: [docs/superpowers/plans/2026-05-24-mr-ducksafe-mvp.md](docs/superpowers/plans/2026-05-24-mr-ducksafe-mvp.md)
 
 ---
 
-## Katkı: Yeni Mapping Eklemek
+## Contributing: Adding a New Mapping
 
-`internal/matcher/data/mappings.yaml` dosyasına PR aç. Her giriş:
+Open a PR against `internal/matcher/data/mappings.yaml`. Each entry:
 
 ```yaml
-- registry_name: "App Name"          # veya registry_name_pattern (regex)
+- registry_name: "App Name"          # or registry_name_pattern (regex)
   publisher: "Vendor"
   identifier:
     type: cpe
     value: "cpe:2.3:a:vendor:product"
   version_normalize: "semver"        # semver | fourpart | calver
-  version_from_name: "(\\d+\\.\\d+)" # opsiyonel — isimden versiyon çıkar
-  winget_id: "Vendor.Product"        # opsiyonel — remediation komutu
-  update_url: "https://..."          # opsiyonel — manuel güncelleme linki
+  version_from_name: "(\\d+\\.\\d+)" # optional — extract version from name
+  winget_id: "Vendor.Product"        # optional — remediation command
+  update_url: "https://..."          # optional — manual update link
 ```
 
-CPE'leri [nvd.nist.gov/products/cpe/search](https://nvd.nist.gov/products/cpe/search) üzerinden doğrula.
+Verify CPEs via [nvd.nist.gov/products/cpe/search](https://nvd.nist.gov/products/cpe/search).
 
-Bug, feature veya yeni mapping önerisi için [issue template'lerini](.github/ISSUE_TEMPLATE/) kullan.
+Use the [issue templates](.github/ISSUE_TEMPLATE/) to report a bug, request a feature, or suggest a new mapping.
 
 ---
 
-## Yol Haritası
+## Roadmap
 
-**v0.1 (mevcut MVP)** ✅
-- Windows Registry tarayıcı
-- NVD CPE + version range eşleştirme
-- 50 curated mapping
-- Rehberli özet + winget remediation + Seviye A açıklama
-- CLI (`scan` / `history` / `prune`), SQLite geçmiş, JSON/Markdown çıktı
-- Multi-platform release (Windows/Linux/macOS binary) + SBOM
+**v0.1 (current MVP)** ✅
+- Windows Registry scanner
+- NVD CPE + version range matching
+- 50 curated mappings
+- Guided summary + winget remediation + Level A explanations
+- CLI (`scan` / `history` / `prune`), SQLite history, JSON/Markdown output
+- Multi-platform release (Windows/Linux/macOS binaries) + SBOM
 
-**v0.2 (planlanan)**
+**v0.2 (planned)**
 - Linux scanner (dpkg, rpm, pacman)
 - macOS scanner (Homebrew, `/Applications`)
-- Mapping listesi 200+'e (topluluk PR'larıyla)
-- "Düzeltme" sütununda `versionEndIncluding` desteği
+- Mapping list to 200+ (via community PRs)
+- `versionEndIncluding` support in the "Fix" column
 - Scoop bucket + Homebrew tap
 
-**v0.3+ (fikir)**
-- Seviye B: `--explain` flag'i + opsiyonel LLM ile CVE-başına açıklama
-- Browser extension / VS Code extension tarama
-- `--auto-fix` (sorumluluk uyarısıyla)
+**v0.3+ (ideas)**
+- Level B: `--explain` flag + optional LLM for per-CVE explanations
+- Browser extension / VS Code extension scanning
+- `--auto-fix` (with a liability warning)
 
 ---
 
-## Lisans
+## License
 
 [MIT](LICENSE) — Copyright (c) 2026 Yunus Emre Salcan
 
@@ -490,6 +490,6 @@ Bug, feature veya yeni mapping önerisi için [issue template'lerini](.github/IS
 
 <div align="center">
 
-**Açıkları bulup düzeltmek bu kadar basit olmamalıydı.** 🦆
+**Finding and fixing vulnerabilities should never have been this simple.** 🦆
 
 </div>
