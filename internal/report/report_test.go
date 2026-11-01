@@ -81,13 +81,13 @@ func TestWrite_Summary_GroupsAndAdvises(t *testing.T) {
 	out := buf.String()
 
 	wants := []string{
-		"güncellenmesi gereken 1 yazılım",      // gruplu başlık
-		"Firefox",                               // uygulama adı
-		"1 yüksek",                              // severity sayımı
-		"Yakında güncelle",                      // aciliyet (high)
-		"Bellek hatası",                         // risk (use-after-free keyword)
-		"winget upgrade --id Mozilla.Firefox",   // remediation
-		"--details",                             // detay ipucu
+		"güncellenmesi gereken 1 yazılım",     // gruplu başlık
+		"Firefox",                             // uygulama adı
+		"1 yüksek",                            // severity sayımı
+		"Yakında güncelle",                    // aciliyet (high)
+		"Bellek hatası",                       // risk (use-after-free keyword)
+		"winget upgrade --id Mozilla.Firefox", // remediation
+		"--details",                           // detay ipucu
 	}
 	for _, want := range wants {
 		if !strings.Contains(out, want) {

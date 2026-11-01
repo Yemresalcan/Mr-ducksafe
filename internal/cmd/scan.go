@@ -96,7 +96,7 @@ func runScan(cmd *cobra.Command, _ []string) error {
 
 	out := cmd.OutOrStdout()
 	if flagScanOutput != "" {
-		f, err := os.Create(flagScanOutput)
+		f, err := os.Create(flagScanOutput) //nolint:gosec // G304: the path is chosen by the user via --output
 		if err != nil {
 			return fmt.Errorf("output dosyası aç: %w", err)
 		}

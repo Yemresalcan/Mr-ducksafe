@@ -121,10 +121,13 @@ func (e *Engine) queryAll(ctx context.Context, scanID int64, items []matchedApp,
 	sem := make(chan struct{}, conc)
 	var wg sync.WaitGroup
 
+dispatch:
 	for i, item := range items {
 		select {
 		case <-ctx.Done():
-			break
+			// Stop launching new queries; a bare break would only leave the
+			// select and start a goroutine without holding a semaphore slot.
+			break dispatch
 		case sem <- struct{}{}:
 		}
 		wg.Add(1)

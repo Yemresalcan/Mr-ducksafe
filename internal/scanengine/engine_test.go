@@ -3,6 +3,7 @@ package scanengine
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/yemresalcan/mr-ducksafe/internal/matcher"
 	"github.com/yemresalcan/mr-ducksafe/internal/scanner"
@@ -68,5 +69,39 @@ func TestEngine_Run_MatchesAndPersists(t *testing.T) {
 	}
 	if res.Findings[0].CVEID != "CVE-1" {
 		t.Errorf("CVE = %s, want CVE-1", res.Findings[0].CVEID)
+	}
+}
+
+type ctxOSV struct{}
+
+func (ctxOSV) Query(ctx context.Context, _ matcher.Identifier, _ string) ([]vuln.Vulnerability, error) {
+	return nil, ctx.Err()
+}
+
+// A cancelled context used to launch queries without a semaphore slot, whose
+// deferred release could then block forever and hang wg.Wait.
+func TestEngine_queryAll_CancelledContextDoesNotHang(t *testing.T) {
+	eng := New(&fakeScanner{}, fakeMatcher{}, ctxOSV{}, nil)
+	eng.Concurrency = 1
+
+	items := make([]matchedApp, 200)
+	for i := range items {
+		items[i] = matchedApp{
+			app: scanner.InstalledApp{Name: "Known", Version: "1.0"},
+			id:  matcher.Identifier{Type: matcher.IdentifierTypeCPE, Value: "cpe:test:known"},
+		}
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	done := make(chan struct{})
+	go func() {
+		eng.queryAll(ctx, 1, items, nil)
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("queryAll did not return after context cancellation")
 	}
 }

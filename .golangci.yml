@@ -20,6 +20,8 @@ linters:
       excludes:
         - G104  # audited error returns
   exclusions:
+    presets:
+      - std-error-handling  # unchecked Close / fmt.Fprint* errors
     rules:
       - path: _test\.go
         linters:
