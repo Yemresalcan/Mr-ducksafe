@@ -83,7 +83,7 @@ func (c *Client) fetch(ctx context.Context, cpe string) ([]byte, error) {
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL, nil)
 	if err != nil {
-		return nil, fmt.Errorf("request oluştur: %w", err)
+		return nil, fmt.Errorf("build request: %w", err)
 	}
 	req.Header.Set("User-Agent", "mr-ducksafe/0.1")
 	if c.apiKey != "" {

@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/yemresalcan/mr-ducksafe/internal/i18n"
+
 	"github.com/fatih/color"
 	"github.com/yemresalcan/mr-ducksafe/internal/scanengine"
 	"github.com/yemresalcan/mr-ducksafe/internal/scanner"
@@ -134,4 +136,34 @@ func normalize(s string) string {
 		out = out[:len(out)-1]
 	}
 	return string(out)
+}
+
+func TestWrite_Summary_EN(t *testing.T) {
+	i18n.Set(i18n.EN)
+	defer i18n.Set(i18n.TR)
+	color.NoColor = true
+	var buf bytes.Buffer
+	if err := Write(&buf, fixtureResult(), FormatTable, Options{}); err != nil {
+		t.Fatal(err)
+	}
+	out := buf.String()
+	for _, want := range []string{
+		"1 applications need updating",
+		"HIGH",
+		"1 high",
+		"Urgency:",
+		"Update soon",
+		"memory error",
+		"Fix:",
+		"winget upgrade --id Mozilla.Firefox",
+	} {
+		if !strings.Contains(out, want) {
+			t.Errorf("English summary should contain %q.\nOutput:\n%s", want, out)
+		}
+	}
+	for _, notWant := range []string{"Aciliyet", "Çözüm", "yüksek"} {
+		if strings.Contains(out, notWant) {
+			t.Errorf("English summary must not contain Turkish %q.\nOutput:\n%s", notWant, out)
+		}
+	}
 }

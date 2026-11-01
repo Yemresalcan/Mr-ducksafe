@@ -7,6 +7,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/yemresalcan/mr-ducksafe/internal/advice"
+	"github.com/yemresalcan/mr-ducksafe/internal/i18n"
 	"github.com/yemresalcan/mr-ducksafe/internal/scanengine"
 	"github.com/yemresalcan/mr-ducksafe/internal/store"
 )
@@ -30,13 +31,12 @@ func writeSummary(w io.Writer, r *scanengine.ScanResult, opts Options) error {
 	groups := groupByApp(r.Findings)
 
 	if len(groups) == 0 {
-		fmt.Fprintf(w, "%s %d kurulu yazılım tarandı, açık bulunamadı.\n",
-			color.GreenString("✓"), len(r.Apps))
+		fmt.Fprintln(w, i18n.Tf("sum.clean", color.GreenString("✓"), len(r.Apps)))
 		return nil
 	}
 
-	fmt.Fprintf(w, "mr-ducksafe — güncellenmesi gereken %s yazılım (%d açık)\n\n",
-		color.New(color.Bold).Sprintf("%d", len(groups)), len(r.Findings))
+	fmt.Fprintf(w, "%s\n\n", i18n.Tf("sum.title",
+		color.New(color.Bold).Sprintf("%d", len(groups)), len(r.Findings)))
 
 	for _, g := range groups {
 		fmt.Fprintf(w, "  %s  %s  %s\n",
@@ -45,17 +45,15 @@ func writeSummary(w io.Writer, r *scanengine.ScanResult, opts Options) error {
 			color.New(color.Faint).Sprint(g.version),
 		)
 		fmt.Fprintf(w, "          %s\n", countsLine(g.counts))
-		fmt.Fprintf(w, "          %s %s\n", color.New(color.Faint).Sprint("Aciliyet:"), advice.Urgency(g.worst))
-		fmt.Fprintf(w, "          %s %s\n", color.New(color.Faint).Sprint("Risk:    "), advice.RiskLine(g.worst, g.summaries))
-		fmt.Fprintf(w, "          %s %s\n\n", color.New(color.Faint).Sprint("Çözüm:   "), remediationLine(r, g.name))
+		fmt.Fprintf(w, "          %s %s\n", color.New(color.Faint).Sprint(i18n.T("sum.urgency")), advice.Urgency(g.worst))
+		fmt.Fprintf(w, "          %s %s\n", color.New(color.Faint).Sprint(i18n.T("sum.risk")), advice.RiskLine(g.worst, g.summaries))
+		fmt.Fprintf(w, "          %s %s\n\n", color.New(color.Faint).Sprint(i18n.T("sum.fix")), remediationLine(r, g.name))
 	}
 
-	fmt.Fprintln(w, color.New(color.Faint).Sprint(
-		"  Detay:  mr-ducksafe scan --details        (tüm CVE listesi)\n"+
-			"          mr-ducksafe scan --app \"<isim>\"   (tek uygulama)"))
+	fmt.Fprintln(w, color.New(color.Faint).Sprint(i18n.T("sum.details")))
 
 	if opts.ShowUnmatched && len(r.Unmatched) > 0 {
-		fmt.Fprintf(w, "\nEşleştirilemeyen yazılımlar (%d):\n", len(r.Unmatched))
+		fmt.Fprintln(w, i18n.Tf("sum.unmatched", len(r.Unmatched)))
 		for _, u := range r.Unmatched {
 			fmt.Fprintf(w, "  - %s %s\n", u.Name, u.Version)
 		}
@@ -105,16 +103,16 @@ func total(m map[string]int) int {
 func countsLine(c map[string]int) string {
 	parts := []string{}
 	if c["critical"] > 0 {
-		parts = append(parts, color.RedString("%d kritik", c["critical"]))
+		parts = append(parts, color.RedString("%s", i18n.Tf("count.critical", c["critical"])))
 	}
 	if c["high"] > 0 {
-		parts = append(parts, color.HiRedString("%d yüksek", c["high"]))
+		parts = append(parts, color.HiRedString("%s", i18n.Tf("count.high", c["high"])))
 	}
 	if c["medium"] > 0 {
-		parts = append(parts, color.YellowString("%d orta", c["medium"]))
+		parts = append(parts, color.YellowString("%s", i18n.Tf("count.medium", c["medium"])))
 	}
 	if c["low"] > 0 {
-		parts = append(parts, color.BlueString("%d düşük", c["low"]))
+		parts = append(parts, color.BlueString("%s", i18n.Tf("count.low", c["low"])))
 	}
 	out := ""
 	for i, p := range parts {
@@ -132,7 +130,7 @@ func remediationLine(r *scanengine.ScanResult, appName string) string {
 		return color.CyanString("winget upgrade --id %s", rem.WingetID)
 	}
 	if ok && rem.UpdateURL != "" {
-		return "Güncelle: " + color.CyanString(rem.UpdateURL)
+		return i18n.T("sum.update") + color.CyanString(rem.UpdateURL)
 	}
-	return "Uygulamayı en son sürüme güncelleyin."
+	return i18n.T("sum.updateapp")
 }

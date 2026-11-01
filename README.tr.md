@@ -130,6 +130,20 @@ setx NVD_API_KEY "<key>"
 
 ---
 
+## Dil (English / Türkçe)
+
+mr-ducksafe bir terminalde ilk kez çalıştığında hangi dili kullanmak istediğini sorar ve cevabı hatırlar. Çıktılar, yardım metinleri ve sade dildeki açıklamalar İngilizce ve Türkçe olarak mevcuttur.
+
+```sh
+mr-ducksafe lang          # geçerli dili göster
+mr-ducksafe lang en       # İngilizceye geç (kaydedilir)
+mr-ducksafe scan --lang tr          # sadece bu çalıştırma için
+```
+
+`MR_DUCKSAFE_LANG=en|tr` ortam değişkeni de kayıtlı seçimi geçersiz kılar. CI gibi etkileşimsiz ortamlarda soru sorulmaz, varsayılan İngilizcedir. JSON çıktısı iki dilde de aynıdır.
+
+---
+
 ## Hızlı Kullanım
 
 ```sh
@@ -388,7 +402,7 @@ Evet. Explorer'dan açıldığında `mr-ducksafe scan` çalıştırır, raporu g
 **Windows SmartScreen uyarı veriyor.**
 Release binary'leri henüz kod imzalı değil. İndirdiğin arşivin SHA256 değerini `checksums.txt` ile doğrulayıp "Ek bilgi → Yine de çalıştır" diyebilirsin.
 
-**Linux/macOS'ta `scanner: bu işletim sistemi henüz desteklenmiyor` hatası.**
+**Linux/macOS'ta `scanner: this operating system is not supported yet` hatası.**
 Release'te Linux/macOS binary'leri de var ama yazılım tarayıcısı şu an yalnızca Windows Registry'yi okuyor. dpkg/rpm/Homebrew desteği v0.2'de.
 
 **Exit kodu 2 aldım.**

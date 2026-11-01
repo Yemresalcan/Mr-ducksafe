@@ -2,48 +2,46 @@
 // (Seviye A) öğretici metinler üretir. LLM kullanmaz, tamamen offline.
 package advice
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/yemresalcan/mr-ducksafe/internal/i18n"
+)
 
 // Urgency severity'ye göre aciliyet çerçevesi döner.
 func Urgency(severity string) string {
 	switch strings.ToLower(severity) {
-	case "critical":
-		return "Acilen güncelle — aktif sömürülebilir."
-	case "high":
-		return "Yakında güncelle — ciddi risk."
-	case "medium":
-		return "Fırsat buldukça güncelle."
-	case "low":
-		return "Düşük öncelik."
+	case "critical", "high", "medium", "low":
+		return i18n.T("urg." + strings.ToLower(severity))
 	default:
-		return "Güncelleme önerilir."
+		return i18n.T("urg.unknown")
 	}
 }
 
-// riskKeyword bir anahtar kelime grubunu insan dili açıklamaya eşler.
+// riskKeyword bir anahtar kelime grubunu insan dili açıklamaya (i18n anahtarı) eşler.
 type riskKeyword struct {
 	keywords []string
-	message  string
+	message  string // i18n key
 }
 
 // Sıra önemli: ilk eşleşen kullanılır (en ciddi/spesifik üstte).
 var riskRules = []riskKeyword{
 	{[]string{"remote code execution", "arbitrary code", "rce"},
-		"Uzaktan, internet üzerinden bilgisayarınızda kod çalıştırılabilir."},
+		"risk.rce"},
 	{[]string{"privilege escalation", "elevation of privilege"},
-		"Saldırgan sistemdeki yetkilerini yükseltebilir."},
+		"risk.priv"},
 	{[]string{"use-after-free", "buffer overflow", "out-of-bounds", "memory corruption"},
-		"Bellek hatası yoluyla uygulama ele geçirilebilir."},
+		"risk.memory"},
 	{[]string{"cross-site scripting", "xss"},
-		"Kötü niyetli bir script tarayıcınızda çalıştırılabilir."},
+		"risk.xss"},
 	{[]string{"sql injection"},
-		"Veritabanına yetkisiz erişim/manipülasyon mümkün olabilir."},
+		"risk.sqli"},
 	{[]string{"information disclosure", "information leak", "sensitive data"},
-		"Gizli bilgileriniz sızdırılabilir."},
+		"risk.leak"},
 	{[]string{"denial of service", "dos", "crash"},
-		"Uygulama çökertilerek hizmet engellenebilir."},
+		"risk.dos"},
 	{[]string{"spoofing", "bypass"},
-		"Güvenlik kontrolleri atlatılabilir."},
+		"risk.bypass"},
 }
 
 // RiskLine bulgu özetlerini tarayıp en uygun risk açıklamasını döner.
@@ -53,7 +51,7 @@ func RiskLine(worstSeverity string, summaries []string) string {
 	for _, r := range riskRules {
 		for _, kw := range r.keywords {
 			if strings.Contains(joined, kw) {
-				return r.message
+				return i18n.T(r.message)
 			}
 		}
 	}
@@ -63,10 +61,10 @@ func RiskLine(worstSeverity string, summaries []string) string {
 func genericRisk(severity string) string {
 	switch strings.ToLower(severity) {
 	case "critical", "high":
-		return "Bu sürümde ciddi güvenlik açıkları var; saldırgan sisteminize zarar verebilir."
+		return i18n.T("risk.generic.high")
 	case "medium":
-		return "Bu sürümde orta seviyeli güvenlik açıkları bulunuyor."
+		return i18n.T("risk.generic.medium")
 	default:
-		return "Bu sürümde bilinen güvenlik açıkları bulunuyor."
+		return i18n.T("risk.generic.low")
 	}
 }

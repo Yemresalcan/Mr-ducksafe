@@ -11,6 +11,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/mattn/go-isatty"
+	"github.com/yemresalcan/mr-ducksafe/internal/i18n"
 )
 
 // IsTTY verilen dosyanın bir terminale bağlı olup olmadığını söyler.
@@ -23,7 +24,7 @@ func IsTTY(f *os.File) bool {
 func Banner(version string) string {
 	duck := color.YellowString
 	name := color.New(color.FgCyan, color.Bold).Sprint("mr-ducksafe")
-	sub := color.New(color.Faint).Sprint("yerel kurulu yazilim CVE tarayici")
+	sub := color.New(color.Faint).Sprint(i18n.T("banner.sub"))
 	return fmt.Sprintf(`
   %s
  %s   %s %s

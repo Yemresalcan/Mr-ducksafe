@@ -130,6 +130,20 @@ Delete `mr-ducksafe.exe` and the `%USERPROFILE%\.mr-ducksafe\` folder that holds
 
 ---
 
+## Language (English / Türkçe)
+
+The first time you run mr-ducksafe in a terminal it asks which language to use and remembers the answer. Output, help texts and the plain-language advice are available in English and Turkish.
+
+```sh
+mr-ducksafe lang          # show the current language
+mr-ducksafe lang tr       # switch to Turkish (saved)
+mr-ducksafe scan --lang en          # this run only
+```
+
+`MR_DUCKSAFE_LANG=en|tr` also overrides the saved choice. In CI and other non-interactive runs nobody is asked and the default is English. JSON output is the same in both languages.
+
+---
+
 ## Quick Usage
 
 ```sh
@@ -388,7 +402,7 @@ Yes. When started from Explorer it runs `mr-ducksafe scan`, shows the report and
 **Windows SmartScreen shows a warning.**
 Release binaries are not code-signed yet. Verify the archive's SHA256 against `checksums.txt`, then choose "More info → Run anyway".
 
-**`scanner: bu işletim sistemi henüz desteklenmiyor` (OS not supported) on Linux/macOS.**
+**`scanner: this operating system is not supported yet` on Linux/macOS.**
 Linux/macOS binaries are published, but the software scanner currently only reads the Windows Registry. dpkg/rpm/Homebrew support is planned for v0.2.
 
 **I got exit code 2.**

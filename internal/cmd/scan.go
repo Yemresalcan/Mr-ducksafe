@@ -9,6 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/yemresalcan/mr-ducksafe/internal/config"
+	"github.com/yemresalcan/mr-ducksafe/internal/i18n"
 	"github.com/yemresalcan/mr-ducksafe/internal/matcher"
 	"github.com/yemresalcan/mr-ducksafe/internal/nvd"
 	"github.com/yemresalcan/mr-ducksafe/internal/report"
@@ -32,15 +33,15 @@ var (
 func NewScanCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "scan",
-		Short: "Kurulu yazılımları tarayıp CVE raporu üret",
+		Short: i18n.T("scan.short"),
 		RunE:  runScan,
 	}
-	c.Flags().StringVar(&flagScanFormat, "format", "table", "çıktı formatı: table | json | markdown")
-	c.Flags().StringVar(&flagScanFailOn, "fail-on", "", "eşik aşıldığında exit 1: critical | high | medium | low")
-	c.Flags().BoolVar(&flagScanShowUnmatched, "show-unmatched", false, "eşleştirilemeyen yazılımları da göster")
-	c.Flags().BoolVar(&flagScanDetails, "details", false, "özet yerine tüm CVE'leri tablo halinde göster")
-	c.Flags().StringVar(&flagScanApp, "app", "", "sadece adı bu metni içeren uygulamayı göster")
-	c.Flags().StringVarP(&flagScanOutput, "output", "o", "", "raporu bu dosyaya yaz (varsayılan: stdout)")
+	c.Flags().StringVar(&flagScanFormat, "format", "table", i18n.T("flag.format"))
+	c.Flags().StringVar(&flagScanFailOn, "fail-on", "", i18n.T("flag.failon"))
+	c.Flags().BoolVar(&flagScanShowUnmatched, "show-unmatched", false, i18n.T("flag.showunmatched"))
+	c.Flags().BoolVar(&flagScanDetails, "details", false, i18n.T("flag.details"))
+	c.Flags().StringVar(&flagScanApp, "app", "", i18n.T("flag.app"))
+	c.Flags().StringVarP(&flagScanOutput, "output", "o", "", i18n.T("flag.output"))
 	return c
 }
 
@@ -60,7 +61,7 @@ func runScan(cmd *cobra.Command, _ []string) error {
 	}
 	st, err := store.OpenSQLite("file:" + dbPath + "?_journal=WAL&_fk=1")
 	if err != nil {
-		return fmt.Errorf("DB aç: %w", err)
+		return fmt.Errorf(i18n.T("err.opendb"), err)
 	}
 	defer st.Close()
 
@@ -81,16 +82,16 @@ func runScan(cmd *cobra.Command, _ []string) error {
 	nvdClient := nvd.NewClient()
 	if !nvdClient.HasAPIKey() {
 		fmt.Fprintln(stderr,
-			"ipucu: NVD_API_KEY ortam değişkeni ayarlanmamış — tarama yavaş olabilir (5 istek/30sn).")
+			i18n.T("scan.tip.nokey"))
 		fmt.Fprintln(stderr,
-			"       Ücretsiz key: https://nvd.nist.gov/developers/request-an-api-key")
+			i18n.T("scan.tip.getkey"))
 	}
 	vulnClient := vuln.NewCachedClient(nvdClient)
 
 	eng := scanengine.New(sc, m, vulnClient, st)
 	result, err := runWithProgress(ctx, eng, stderr, tty)
 	if err != nil {
-		fmt.Fprintln(stderr, "scan failed:", err)
+		fmt.Fprintln(stderr, i18n.T("scan.failed"), err)
 		exitFunc(2)
 	}
 
@@ -98,7 +99,7 @@ func runScan(cmd *cobra.Command, _ []string) error {
 	if flagScanOutput != "" {
 		f, err := os.Create(flagScanOutput) //nolint:gosec // G304: the path is chosen by the user via --output
 		if err != nil {
-			return fmt.Errorf("output dosyası aç: %w", err)
+			return fmt.Errorf(i18n.T("scan.err.output"), err)
 		}
 		defer f.Close()
 		out = f
@@ -111,7 +112,7 @@ func runScan(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 	if flagScanOutput != "" {
-		fmt.Fprintf(stderr, "Rapor yazıldı: %s\n", flagScanOutput)
+		fmt.Fprintln(stderr, i18n.Tf("scan.written", flagScanOutput))
 	}
 
 	if shouldFail(result, flagScanFailOn) {
@@ -124,7 +125,7 @@ func runScan(cmd *cobra.Command, _ []string) error {
 // aşama olaylarını canlı spinner'a çevirir.
 func runWithProgress(ctx context.Context, eng *scanengine.Engine, w io.Writer, tty bool) (*scanengine.ScanResult, error) {
 	prog := tui.NewProgress(w, tty)
-	prog.Update("Kurulu yazılımlar taranıyor...")
+	prog.Update(i18n.T("progress.scanning"))
 	prog.Start()
 
 	ch := make(chan scanengine.Progress, 16)
@@ -143,11 +144,11 @@ func runWithProgress(ctx context.Context, eng *scanengine.Engine, w io.Writer, t
 	for p := range ch {
 		switch p.Stage {
 		case scanengine.StageScan:
-			prog.Complete(fmt.Sprintf("Tarama tamamlandı — %d program", p.Total))
-			prog.Update("Eşleştiriliyor...")
+			prog.Complete(i18n.Tf("progress.scanned", p.Total))
+			prog.Update(i18n.T("progress.matching"))
 		case scanengine.StageMatch:
-			prog.Complete(fmt.Sprintf("Eşleştirme tamamlandı — %d eşleşme", p.Done))
-			prog.Update("NVD sorgusu başlıyor...")
+			prog.Complete(i18n.Tf("progress.matched", p.Done))
+			prog.Update(i18n.T("progress.nvdstart"))
 		case scanengine.StageQuery:
 			prog.Update(fmt.Sprintf("NVD sorgusu... %d/%d", p.Done, p.Total))
 		}
@@ -155,7 +156,7 @@ func runWithProgress(ctx context.Context, eng *scanengine.Engine, w io.Writer, t
 	wg.Wait()
 
 	if runErr == nil && result != nil {
-		prog.Complete(fmt.Sprintf("Tamamlandı — %d bulgu", len(result.Findings)))
+		prog.Complete(i18n.Tf("progress.done", len(result.Findings)))
 	}
 	prog.Stop()
 	return result, runErr

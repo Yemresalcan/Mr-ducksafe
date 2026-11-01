@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/yemresalcan/mr-ducksafe/internal/config"
+	"github.com/yemresalcan/mr-ducksafe/internal/i18n"
 	"github.com/yemresalcan/mr-ducksafe/internal/store"
 )
 
@@ -15,10 +16,10 @@ var flagHistoryLimit int
 func NewHistoryCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "history",
-		Short: "Geçmiş tarama kayıtlarını listele",
+		Short: i18n.T("history.short"),
 		RunE:  runHistory,
 	}
-	c.Flags().IntVar(&flagHistoryLimit, "limit", 20, "kaç kayıt gösterilsin")
+	c.Flags().IntVar(&flagHistoryLimit, "limit", 20, i18n.T("flag.limit"))
 	return c
 }
 
@@ -33,7 +34,7 @@ func runHistory(cmd *cobra.Command, _ []string) error {
 	}
 	st, err := store.OpenSQLite("file:" + dbPath + "?_journal=WAL&_fk=1")
 	if err != nil {
-		return fmt.Errorf("DB aç: %w", err)
+		return fmt.Errorf(i18n.T("err.opendb"), err)
 	}
 	defer st.Close()
 
@@ -43,12 +44,12 @@ func runHistory(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 	if len(scans) == 0 {
-		fmt.Fprintln(cmd.OutOrStdout(), "Henüz tarama kaydı yok. `mr-ducksafe scan` ile başla.")
+		fmt.Fprintln(cmd.OutOrStdout(), i18n.T("history.empty"))
 		return nil
 	}
 
 	tw := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 0, 2, ' ', 0)
-	fmt.Fprintln(tw, "ID\tTarih\tDurum\tSüre\tBulgu")
+	fmt.Fprintln(tw, i18n.T("history.header"))
 	for _, s := range scans {
 		duration := "-"
 		if s.FinishedAt != nil {

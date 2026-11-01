@@ -4,23 +4,24 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/yemresalcan/mr-ducksafe/internal/i18n"
 	"github.com/yemresalcan/mr-ducksafe/internal/scanengine"
 )
 
 func writeMarkdown(w io.Writer, r *scanengine.ScanResult, _ Options) error {
 	counts := r.CountBySeverity()
 	fmt.Fprintf(w, "# mr-ducksafe scan #%d\n\n", r.ScanID)
-	fmt.Fprintf(w, "- Tarandı: **%d** kurulu yazılım\n", len(r.Apps))
-	fmt.Fprintf(w, "- Eşleştirilemedi: **%d**\n", len(r.Unmatched))
-	fmt.Fprintf(w, "- Bulgular: 🔴 %d kritik · 🟠 %d yüksek · 🟡 %d orta · 🔵 %d düşük\n\n",
-		counts["critical"], counts["high"], counts["medium"], counts["low"])
+	fmt.Fprintln(w, i18n.Tf("md.scanned", len(r.Apps)))
+	fmt.Fprintln(w, i18n.Tf("md.unmatched", len(r.Unmatched)))
+	fmt.Fprintf(w, "%s\n\n", i18n.Tf("md.findings",
+		counts["critical"], counts["high"], counts["medium"], counts["low"]))
 
 	if len(r.Findings) == 0 {
-		fmt.Fprintln(w, "✅ Açık güvenlik bulgusu yok.")
+		fmt.Fprintln(w, i18n.T("md.none"))
 		return nil
 	}
 
-	fmt.Fprintln(w, "| Severity | Uygulama | Sürüm | CVE | Düzeltme | Özet |")
+	fmt.Fprintln(w, i18n.T("md.header"))
 	fmt.Fprintln(w, "|---|---|---|---|---|---|")
 	for _, f := range r.Findings {
 		summary := f.Summary

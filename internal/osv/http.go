@@ -99,7 +99,7 @@ func (c *HTTPClient) doWithRetry(ctx context.Context, payload []byte) ([]byte, e
 
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.endpoint, bytes.NewReader(payload))
 		if err != nil {
-			return nil, fmt.Errorf("request oluştur: %w", err)
+			return nil, fmt.Errorf("build request: %w", err)
 		}
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("User-Agent", "mr-ducksafe/0.1")
@@ -128,7 +128,7 @@ func (c *HTTPClient) doWithRetry(ctx context.Context, payload []byte) ([]byte, e
 		backoff *= 2
 	}
 	if lastErr == nil {
-		lastErr = errors.New("OSV: max retry aşıldı")
+		lastErr = errors.New("OSV: max retries exceeded")
 	}
 	return nil, lastErr
 }

@@ -21,7 +21,7 @@ type Scanner interface {
 }
 
 // ErrUnsupportedOS runtime OS desteklenmiyorsa döner.
-var ErrUnsupportedOS = errors.New("scanner: bu işletim sistemi henüz desteklenmiyor")
+var ErrUnsupportedOS = errors.New("scanner: this operating system is not supported yet")
 
 // New runtime OS'una göre uygun Scanner implementasyonunu döner.
 func New() (Scanner, error) {

@@ -8,6 +8,7 @@ import (
 
 	"github.com/inconshreveable/mousetrap"
 	"github.com/spf13/cobra"
+	"github.com/yemresalcan/mr-ducksafe/internal/i18n"
 )
 
 // startedByExplorer Windows'ta exe'ye Explorer'dan çift tıklanıp
@@ -30,7 +31,7 @@ func autoScanArgs(args []string, explorer bool) []string {
 
 // waitForEnter pencere kapanmadan önce Enter bekler.
 func waitForEnter(in io.Reader, out io.Writer) {
-	fmt.Fprint(out, "\nPencereyi kapatmak için Enter'a basın... ")
+	fmt.Fprint(out, i18n.T("pause.enter"))
 	_, _ = bufio.NewReader(in).ReadString('\n')
 }
 

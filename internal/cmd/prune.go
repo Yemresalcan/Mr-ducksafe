@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/yemresalcan/mr-ducksafe/internal/config"
+	"github.com/yemresalcan/mr-ducksafe/internal/i18n"
 	"github.com/yemresalcan/mr-ducksafe/internal/store"
 )
 
@@ -15,10 +16,10 @@ var flagPruneOlderThan string
 func NewPruneCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "prune",
-		Short: "Belirli yaştan eski scan kayıtlarını sil",
+		Short: i18n.T("prune.short"),
 		RunE:  runPrune,
 	}
-	c.Flags().StringVar(&flagPruneOlderThan, "older-than", "30d", "süre: 7d, 24h, 30d gibi")
+	c.Flags().StringVar(&flagPruneOlderThan, "older-than", "30d", i18n.T("flag.olderthan"))
 	return c
 }
 
@@ -46,7 +47,7 @@ func runPrune(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(cmd.OutOrStdout(), "%d scan kaydı silindi\n", n)
+	fmt.Fprintln(cmd.OutOrStdout(), i18n.Tf("prune.done", n))
 	return nil
 }
 
@@ -56,7 +57,7 @@ func parseHumanDuration(s string) (time.Duration, error) {
 	if len(s) >= 2 && s[len(s)-1] == 'd' {
 		var days int
 		if _, err := fmt.Sscanf(s, "%dd", &days); err != nil {
-			return 0, fmt.Errorf("geçersiz süre: %s", s)
+			return 0, fmt.Errorf(i18n.T("prune.invalid"), s)
 		}
 		return time.Duration(days) * 24 * time.Hour, nil
 	}
