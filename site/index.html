@@ -44,7 +44,7 @@
       --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scroll-padding-top: 96px; }
     @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
     html, body { overflow-x: clip; }
     body { margin: 0; background: var(--bg); color: var(--text); font: 400 17px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
@@ -72,7 +72,13 @@
     @media (max-width: 600px) { .frame { margin: 8px; border-radius: 20px; } }
 
     /* ---------- nav ---------- */
+    .topbar { position: fixed; top: 16px; left: 16px; right: 16px; z-index: 50; transition: top .25s ease; }
+    .topbar .nav { max-width: none; border: 1px solid transparent; border-radius: 22px; transition: background .25s ease, border-color .25s ease, box-shadow .25s ease, height .25s ease; }
+    .topbar.scrolled { top: 10px; }
+    .topbar.scrolled .nav { height: 66px; background: rgba(8,11,15,.82); -webkit-backdrop-filter: saturate(150%) blur(14px); backdrop-filter: saturate(150%) blur(14px); border-color: var(--line); box-shadow: 0 18px 40px rgba(0,0,0,.45); }
     .nav { position: relative; z-index: 3; display: flex; align-items: center; gap: 28px; height: 84px; padding: 0 28px; }
+    .hero-spacer { height: 84px; }
+    @media (max-width: 600px) { .topbar { top: 8px; left: 8px; right: 8px; } .topbar.scrolled { top: 6px; } }
     .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
     .brand img { width: 30px; height: 30px; }
     .brand span { font: 700 18px var(--mono); color: var(--yellow); }
@@ -97,7 +103,7 @@
       .nav ul, .nav .pill { display: none; }
       .nav .lang { margin-left: auto; }
       .menu-btn { display: inline-flex; margin-left: 10px; }
-      .nav.open ul { display: flex; flex-direction: column; position: absolute; top: 76px; left: 12px; right: 12px; background: #0C1218; border: 1px solid var(--line); padding: 18px 22px; gap: 14px; border-radius: 16px; }
+      .nav.open ul { display: flex; flex-direction: column; position: absolute; top: calc(100% + 8px); left: 12px; right: 12px; background: #0C1218; border: 1px solid var(--line); padding: 18px 22px; gap: 14px; border-radius: 16px; }
     }
 
     /* ---------- hero ---------- */
@@ -173,8 +179,9 @@
     .verdict .app { display: flex; align-items: center; gap: 10px; font-size: 21px; font-weight: 500; margin-top: 16px; }
     .verdict .urg { color: var(--red); margin: 12px 0 6px; }
     .verdict .risk { font-size: 19px; margin: 0 0 18px; }
-    .fixline { display: flex; align-items: center; gap: 12px; justify-content: space-between; background: #080B10; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font: 600 14px var(--mono); color: var(--mint); }
-    .fixline > span { white-space: nowrap; overflow-x: auto; min-width: 0; }
+    .fixline { display: flex; align-items: flex-start; gap: 12px; justify-content: space-between; background: #080B10; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font: 600 14px/1.6 var(--mono); color: var(--mint); }
+    .fixline > span { white-space: normal; overflow-wrap: break-word; min-width: 0; padding-top: 2px; }
+    .fixline .nw { white-space: nowrap; }
     .copy { background: transparent; border: 1px solid var(--line-2); color: var(--muted); border-radius: 999px; padding: 5px 11px; font: 600 12px var(--sans); cursor: pointer; flex: none; }
     .copy:hover { color: #fff; border-color: #3B4757; }
     .arrow { align-self: center; color: var(--yellow); font-size: 40px; }
@@ -259,20 +266,8 @@
   <a class="skip" href="#main" data-i18n="skip">Skip to content</a>
   <div class="glow-cursor" aria-hidden="true"></div>
 
-  <!-- ================= HERO (framed) ================= -->
-  <header class="frame" id="top">
-    <svg class="lines" viewBox="0 0 1400 820" preserveAspectRatio="none" aria-hidden="true">
-      <g fill="none" stroke="#2DD4BF" stroke-opacity=".28" stroke-width="1.2">
-        <path d="M-60 820 C 180 600, 260 320, 120 -20"/>
-        <path d="M60 820 C 300 560, 330 260, 260 -20"/>
-        <path d="M1460 820 C 1220 600, 1140 320, 1280 -20"/>
-        <path d="M1340 820 C 1100 560, 1070 260, 1140 -20"/>
-      </g>
-      <g fill="none" stroke="#FFC93C" stroke-opacity=".14" stroke-width="1">
-        <path d="M420 820 C 520 640, 560 420, 540 -20"/>
-        <path d="M980 820 C 880 640, 840 420, 860 -20"/>
-      </g>
-    </svg>
+  <!-- ================= STICKY NAV ================= -->
+  <div class="topbar">
     <nav class="nav" id="nav" aria-label="Main">
       <a class="brand" href="#top" aria-label="mr-ducksafe"><img src="favicon.svg" alt=""><span>mr-ducksafe</span></a>
       <ul id="menu">
@@ -291,7 +286,24 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
     </nav>
+  </div>
 
+  <!-- ================= HERO (framed) ================= -->
+  <header class="frame" id="top">
+    <svg class="lines" viewBox="0 0 1400 820" preserveAspectRatio="none" aria-hidden="true">
+      <g fill="none" stroke="#2DD4BF" stroke-opacity=".28" stroke-width="1.2">
+        <path d="M-60 820 C 180 600, 260 320, 120 -20"/>
+        <path d="M60 820 C 300 560, 330 260, 260 -20"/>
+        <path d="M1460 820 C 1220 600, 1140 320, 1280 -20"/>
+        <path d="M1340 820 C 1100 560, 1070 260, 1140 -20"/>
+      </g>
+      <g fill="none" stroke="#FFC93C" stroke-opacity=".14" stroke-width="1">
+        <path d="M420 820 C 520 640, 560 420, 540 -20"/>
+        <path d="M980 820 C 880 640, 840 420, 860 -20"/>
+      </g>
+    </svg>
+
+    <div class="hero-spacer" aria-hidden="true"></div>
     <div class="hero-body">
       <h1 data-i18n="hero.title">The CVE scanner that turns <em>525 vulnerabilities</em> into 14 actions</h1>
       <p data-i18n="hero.lead">mr-ducksafe scans the software installed on Windows, checks it against the official NVD database and tells you — in plain language — what to update first and how.</p>
@@ -314,6 +326,19 @@
   </header>
 
   <main id="main">
+    <!-- ================= VIDEO (framed) ================= -->
+    <section class="block" id="video" style="padding:72px 0 0">
+      <div class="wrap">
+        <div class="vframe">
+          <div class="inner">
+            <video controls preload="none" playsinline poster="media/thumbnail.png" aria-label="mr-ducksafe promo video">
+              <source src="media/mr-ducksafe-youtube.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ================= HOW IT WORKS (stacked cards) ================= -->
     <section class="block" id="how">
       <div class="wrap">
@@ -381,19 +406,6 @@
           <span class="c-dim">Risk:   </span> The application can be hijacked through a memory error.
           <span class="c-dim">Fix:    </span> <span class="c-fix">winget upgrade --id Google.Chrome</span></pre></div>
           </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= VIDEO (framed) ================= -->
-    <section class="block" id="video" style="padding-top:20px">
-      <div class="wrap">
-        <div class="vframe">
-          <div class="inner">
-            <video controls preload="none" playsinline poster="media/thumbnail.png" aria-label="mr-ducksafe promo video">
-              <source src="media/mr-ducksafe-youtube.mp4" type="video/mp4">
-            </video>
-          </div>
         </div>
       </div>
     </section>
@@ -579,13 +591,13 @@
           <div class="gs-outer"><div class="gs-inner">
             <h3 data-i18n="gs.2.t">Install with Go</h3>
             <p data-i18n="gs.2.d">Have Go 1.25 or newer? Install straight from source.</p>
-            <div class="fixline"><span>go install github.com/yemresalcan/mr-ducksafe/cmd/mr-ducksafe@latest</span><button class="copy" data-copy="go install github.com/yemresalcan/mr-ducksafe/cmd/mr-ducksafe@latest" data-i18n="copy">Copy</button></div>
+            <div class="fixline"><span>go install <span class="nw">github.com/</span><wbr><span class="nw">yemresalcan/</span><wbr><span class="nw">mr-ducksafe/</span><wbr><span class="nw">cmd/</span><wbr><span class="nw">mr-ducksafe@latest</span></span><button class="copy" data-copy="go install github.com/yemresalcan/mr-ducksafe/cmd/mr-ducksafe@latest" data-i18n="copy">Copy</button></div>
             <div class="actions"><a class="link-y" href="https://github.com/Yemresalcan/Mr-ducksafe#installation" data-i18n="gs.2.cta">Installation guide</a></div>
           </div></div>
           <div class="gs-outer"><div class="gs-inner">
             <h3 data-i18n="gs.3.t">Get a free NVD API key</h3>
             <p data-i18n="gs.3.d">Optional but recommended: scans get about 10× faster. Set it once and open a new terminal.</p>
-            <div class="fixline"><span>setx NVD_API_KEY "&lt;key&gt;"</span><button class="copy" data-copy='setx NVD_API_KEY "<key>"' data-i18n="copy">Copy</button></div>
+            <div class="fixline"><span><span class="nw">setx NVD_API_KEY</span> <span class="nw">"&lt;key&gt;"</span></span><button class="copy" data-copy='setx NVD_API_KEY "<key>"' data-i18n="copy">Copy</button></div>
             <div class="actions"><a class="link-y" href="https://nvd.nist.gov/developers/request-an-api-key" data-i18n="gs.3.cta">Request a key</a></div>
           </div></div>
         </div>
@@ -769,6 +781,11 @@
       nav.querySelectorAll('#menu a').forEach(function (a) { a.addEventListener('click', function () { nav.classList.remove('open'); mb.setAttribute('aria-expanded', 'false'); }); });
 
       apply(pick());
+
+      /* sticky nav: solid background once the page scrolls */
+      var bar = document.querySelector('.topbar');
+      function onScroll() { bar.classList.toggle('scrolled', window.scrollY > 24); }
+      window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
 
       /* yellow light that follows the mouse */
       var glow = document.querySelector('.glow-cursor');
