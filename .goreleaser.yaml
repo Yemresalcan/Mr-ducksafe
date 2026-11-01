@@ -84,6 +84,9 @@ release:
     name: mr-ducksafe
   draft: false
   prerelease: auto
+  # If the release was already created in the GitHub UI, overwrite its notes
+  # with the header + changelog below instead of keeping an empty body.
+  mode: replace
   header: |
     ## mr-ducksafe {{ .Tag }}
 
