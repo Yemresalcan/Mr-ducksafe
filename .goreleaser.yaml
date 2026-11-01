@@ -42,6 +42,7 @@ archives:
     files:
       - LICENSE
       - README.md
+      - README.tr.md
 
 checksum:
   name_template: "checksums.txt"
@@ -86,13 +87,20 @@ release:
   header: |
     ## mr-ducksafe {{ .Tag }}
 
-    Windows kurulu yazılımları için NVD CVE tarayıcı.
+    NVD CVE scanner for the software installed on Windows — a single binary, straight from the terminal.
+    525 CVEs → 14 action items: plain-language risk, a fix command for every finding.
 
-    İndir, çalıştır:
+    **Quick start (Windows):** download `mr-ducksafe_{{ .Version }}_Windows_x86_64.zip` below, unzip, then run:
 
-    ```sh
-    mr-ducksafe scan
+    ```powershell
+    .\mr-ducksafe.exe scan
     ```
+
+    Or with Go 1.25+: `go install github.com/yemresalcan/mr-ducksafe/cmd/mr-ducksafe@{{ .Tag }}`
+
+    > The scanner currently reads the Windows Registry only. Linux/macOS binaries are published for
+    > CI/tooling use, but `scan` reports "unsupported OS" there until v0.2.
   footer: |
     ---
-    SHA256 checksum'lar `checksums.txt`'de. SBOM'lar her arşiv için `.sbom.json` olarak yayınlandı.
+    SHA256 checksums are in `checksums.txt`. An SBOM (CycloneDX, `*.sbom.json`) is published for every archive.
+    Free NVD API key for ~10x faster scans: https://nvd.nist.gov/developers/request-an-api-key
