@@ -27,7 +27,7 @@
 ## 🎬 Tanıtım Videosu
 
 <!-- YouTube'a yükledikten sonra aşağıdaki linkleri video URL'leriyle değiştir. -->
-<a href="docs/media/mr-ducksafe-youtube.mp4"><img src="docs/media/thumbnail.png" alt="mr-ducksafe tanıtım videosu — 525 CVE → 14 aksiyon" width="720"></a>
+<a href="docs/media/mr-ducksafe-youtube.mp4"><img src="docs/media/thumbnail.png" alt="mr-ducksafe tanıtım videosu — yüzlerce CVE → birkaç aksiyon" width="720"></a>
 
 - ▶️ **YouTube (1:58):** [docs/media/mr-ducksafe-youtube.mp4](docs/media/mr-ducksafe-youtube.mp4) — sorun, nasıl çalışır, canlı demo, CI kullanımı, gizlilik
 - 📱 **Shorts (0:37, dikey):** [docs/media/mr-ducksafe-short.mp4](docs/media/mr-ducksafe-short.mp4)

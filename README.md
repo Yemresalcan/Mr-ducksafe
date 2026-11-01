@@ -27,7 +27,7 @@ Not 500+ CVEs → ~10 action items. Risk in plain language, fix in one command.
 ## 🎬 Promo Video
 
 <!-- After uploading to YouTube, replace the links below with the video URLs. -->
-<a href="docs/media/mr-ducksafe-youtube.mp4"><img src="docs/media/thumbnail.png" alt="mr-ducksafe promo video — 525 CVEs → 14 actions" width="720"></a>
+<a href="docs/media/mr-ducksafe-youtube.mp4"><img src="docs/media/thumbnail.png" alt="mr-ducksafe promo video — hundreds of CVEs → a few actions" width="720"></a>
 
 - ▶️ **YouTube (1:58):** [docs/media/mr-ducksafe-youtube.mp4](docs/media/mr-ducksafe-youtube.mp4) — the problem, how it works, live demo, CI usage, privacy
 - 📱 **Shorts (0:37, vertical):** [docs/media/mr-ducksafe-short.mp4](docs/media/mr-ducksafe-short.mp4)

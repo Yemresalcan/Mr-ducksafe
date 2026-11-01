@@ -1415,10 +1415,12 @@ def render_thumbnail():
     pill(img, "WINDOWS · FREE CVE SCANNER", 56, 48, 30, CRUST, DUCK, None, "lt", 1, "xbold",
          padx=22, pady=10)
     x = 50
-    w1 = tw("525 ", "black", 196)
-    txt(img, "525", x, 100, "black", 196, RED, stroke=stroke)
-    txt(img, "CVEs", x + w1 - 8, 100, "black", 196, WHITE, stroke=stroke)
-    txt(img, "→ 14 ACTIONS", x + 4, 335, "black", 110, GREEN, stroke=stroke)
+    # Generic claim on purpose: a specific count (e.g. 525) reads like a
+    # promise about every PC, but it is only what one sample scan found.
+    w1 = tw("100s ", "black", 176)
+    txt(img, "100s", x, 108, "black", 176, RED, stroke=stroke)
+    txt(img, "OF CVEs", x + w1 - 8, 108, "black", 176, WHITE, stroke=stroke)
+    txt(img, "→ A FEW ACTIONS", x + 4, 335, "black", 96, GREEN, stroke=stroke)
     txt(img, "one command, plain English", x + 8, 480, "bold", 54, WHITE, stroke=5)
     pill(img, "> mr-ducksafe scan", 58, 590, 40, DUCK, CRUST, SURF1, "lt", 1, "monob",
          padx=24, pady=12)

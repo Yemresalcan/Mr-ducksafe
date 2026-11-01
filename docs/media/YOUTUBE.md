@@ -17,17 +17,17 @@ are synthesized in code, so there is nothing to credit or license.
 **Title** (≤ 100 characters)
 
 ```
-525 Vulnerabilities on One Windows PC? Find Them With One Command — mr-ducksafe (Free CVE Scanner)
+Hundreds of Known Vulnerabilities on Your PC? Find Them With One Command — mr-ducksafe (Free CVE Scanner)
 ```
 
 Alternatives:
-- `525 CVEs → 14 Actions: Find Outdated, Vulnerable Software on Windows in One Command`
+- `Hundreds of CVEs → A Few Actions: Find Outdated, Vulnerable Software on Windows in One Command`
 - `mr-ducksafe: a Free, Open-Source CVE Scanner for Windows Software`
 
 **Description**
 
 ```
-Chrome, Adobe Reader, Office, AnyDesk, Node.js… old versions of everyday apps carry hundreds of publicly known vulnerabilities (CVEs). mr-ducksafe scans the software installed on Windows, checks it against the official NVD CVE database, and turns "525 vulnerabilities" into "14 actions" — explained in plain language, each with a fix command.
+Chrome, Adobe Reader, Office, AnyDesk, Node.js… old versions of everyday apps carry hundreds of publicly known vulnerabilities (CVEs). mr-ducksafe scans the software installed on Windows, checks it against the official NVD CVE database, and turns hundreds of CVEs into a short list of actions — explained in plain language, each with a fix command. (In the demo, one real developer PC had 525 known CVEs across 14 apps.)
 
 🦆 GitHub: https://github.com/yemresalcan/mr-ducksafe
 
@@ -84,7 +84,7 @@ How many security holes are on your PC? 🦆 #shorts
 
 ```
 One command: mr-ducksafe scan
-525 known vulnerabilities → 14 clear actions, with plain-language risk and a winget fix.
+Hundreds of known vulnerabilities → a few clear actions, with plain-language risk and a winget fix.
 Free & open source: https://github.com/yemresalcan/mr-ducksafe
 
 #shorts #cybersecurity #windows #cve #opensource #devsecops #infosec
