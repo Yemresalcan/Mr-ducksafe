@@ -28,6 +28,15 @@ var langFile = func() (string, error) {
 	return filepath.Join(dir, "lang"), nil
 }
 
+// welcomed is set when the first-run splash was printed, so the regular
+// banner is not shown a second time in the same run.
+var welcomed bool
+
+// welcomeText is the first-run splash (overridable in tests).
+var welcomeText = func() string {
+	return tui.Welcome(Version, "CVE scanner for installed Windows software")
+}
+
 // isInteractive reports whether a person can answer the language prompt.
 // CI, pipes and redirected input never get a prompt.
 var isInteractive = func() bool {
@@ -90,9 +99,12 @@ func isLangCommand(args []string) bool {
 }
 
 func promptLang(in io.Reader, out io.Writer) i18n.Lang {
+	fmt.Fprint(out, welcomeText())
+	welcomed = true
 	r := bufio.NewReader(in)
 	for tries := 0; tries < 3; tries++ {
-		fmt.Fprint(out, i18n.T("lang.prompt"))
+		fmt.Fprint(out, tui.Question("Choose your language / Dil seçin",
+			[]string{"English", "Türkçe"}, "(default / varsayılan)"))
 		line, err := r.ReadString('\n')
 		if strings.TrimSpace(line) == "" {
 			return i18n.EN

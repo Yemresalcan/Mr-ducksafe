@@ -76,7 +76,9 @@ func runScan(cmd *cobra.Command, _ []string) error {
 	stderr := cmd.ErrOrStderr()
 	tty := tui.IsTTY(os.Stderr)
 	if tty {
-		fmt.Fprint(stderr, tui.Banner(Version))
+		if !welcomed {
+			fmt.Fprint(stderr, tui.Banner(Version))
+		}
 	}
 
 	nvdClient := nvd.NewClient()
@@ -150,7 +152,7 @@ func runWithProgress(ctx context.Context, eng *scanengine.Engine, w io.Writer, t
 			prog.Complete(i18n.Tf("progress.matched", p.Done))
 			prog.Update(i18n.T("progress.nvdstart"))
 		case scanengine.StageQuery:
-			prog.Update(fmt.Sprintf("NVD sorgusu... %d/%d", p.Done, p.Total))
+			prog.Update(i18n.Tf("progress.nvd", p.Done, p.Total))
 		}
 	}
 	wg.Wait()

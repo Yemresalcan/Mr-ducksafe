@@ -4,10 +4,6 @@ type msg = map[Lang]string
 
 var messages = map[string]msg{
 	// ---- language selection -------------------------------------------
-	"lang.prompt": {
-		EN: "Choose your language / Dil seçin:\n  1) English\n  2) Türkçe\n> ",
-		TR: "Choose your language / Dil seçin:\n  1) English\n  2) Türkçe\n> ",
-	},
 	"lang.saved": {
 		EN: "Language set to English. Change it any time with: mr-ducksafe lang tr",
 		TR: "Dil Türkçe olarak ayarlandı. İstediğin zaman değiştir: mr-ducksafe lang en",

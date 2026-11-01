@@ -44,3 +44,27 @@ func TestProgress_DisabledIsNoOp(t *testing.T) {
 		t.Errorf("disabled modda çıktı olmamalı, alındı: %q", buf.String())
 	}
 }
+
+func TestWordmark(t *testing.T) {
+	lines := Wordmark("MR.DUCKSAFE")
+	if len(lines) != 3 {
+		t.Fatalf("want 3 rows, got %d", len(lines))
+	}
+	for _, l := range lines {
+		if w := len([]rune(l)); w > 72 {
+			t.Errorf("wordmark row is %d cols wide, must fit an 80-col console", w)
+		}
+		if strings.ContainsAny(l, "#.") {
+			t.Errorf("raw bitmap characters leaked: %q", l)
+		}
+	}
+}
+
+func TestQuestionMarksDefault(t *testing.T) {
+	q := Question("Pick one", []string{"First", "Second"}, "(default)")
+	for _, want := range []string{"Pick one", "1)", "First", "(default)", "2)", "Second"} {
+		if !strings.Contains(q, want) {
+			t.Errorf("question missing %q: %q", want, q)
+		}
+	}
+}
