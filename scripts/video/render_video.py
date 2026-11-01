@@ -561,17 +561,18 @@ def yt_scenes(W=1920, H=1080):
     # 1 — Hook ---------------------------------------------------------------
     def hook(c, t):
         a1, a2 = ap(t, 0.2), ap(t, 0.7)
-        txt(c, "On an ordinary Windows PC,", cx, 250 + (1 - a1) * 30, "semi", 52, SUB, "mt", a1)
-        txt(c, "how many known vulnerabilities?", cx, 320 + (1 - a2) * 30, "xbold", 88, WHITE, "mt", a2)
+        txt(c, "Every outdated app on your PC", cx, 250 + (1 - a1) * 30, "semi", 52, SUB, "mt", a1)
+        txt(c, "carries known vulnerabilities.", cx, 320 + (1 - a2) * 30, "xbold", 88, WHITE, "mt", a2)
         p = ease_out((t - 1.7) / 1.9)
         if t > 1.7:
-            n = int(round(525 * p))
+            # a generic "100s", not a specific count: numbers differ per PC
+            label = "100s" if p >= 0.999 else str(int(round(100 * p)))
             pulse = 1 + 0.08 * math.sin(clamp((t - 3.6) / 0.35) * math.pi)
             put(c, glow_sprite(360, RED, 70), cx, 650, "mm", alpha=p)
-            txt(c, str(n), cx, 650, "black", 300, RED, "mm", 1.0, pulse)
+            txt(c, label, cx, 650, "black", 300, RED, "mm", 1.0, pulse)
         a3 = ap(t, 3.9)
-        rich(c, [("known CVEs  ·  ", SUB, "semi"), ("in 14 apps", PEACH, "semi"),
-                 ("  ·  one scan", SUB, "semi")], cx, 850 + (1 - a3) * 20, 46, "mt", a3)
+        rich(c, [("of known CVEs can hide in ", SUB, "semi"), ("outdated apps", PEACH, "semi")],
+             cx, 850 + (1 - a3) * 20, 46, "mt", a3)
 
     scenes.append(Scene(5.8, hook, [(1.7, "riser"), (3.6, "pop")], "hook", "Intro"))
 
@@ -690,9 +691,10 @@ def yt_scenes(W=1920, H=1080):
             x, y, w, h = W - 150 - 40 - 600, 200, 600, 230
             a = clamp(e)
             card(c, x, y, w, h, 26, (32, 26, 40), RED, a)
-            rich(c, [("525 CVEs", RED, "black")], x + w / 2, y + 30, 84, "mt", a)
-            rich(c, [("→  ", OVER0, "bold"), ("14 actions", GREEN, "black")], x + w / 2, y + 132,
-                 60, "mt", a)
+            txt(c, "ON THIS PC", x + w / 2, y + 22, "semi", 22, OVER0, "mt", a)
+            rich(c, [("525 CVEs", RED, "black")], x + w / 2, y + 54, 76, "mt", a)
+            rich(c, [("→  ", OVER0, "bold"), ("14 actions", GREEN, "black")], x + w / 2, y + 146,
+                 54, "mt", a)
 
     scenes.append(Scene(sc.duration, scan, [(x, "click") for x in sc.clicks()]
                         + [(t_done + 0.2, "pop")], "scan", "Demo: mr-ducksafe scan"))
@@ -909,9 +911,11 @@ def short_scenes(W=1080, H=1920):
         if t > 1.3:
             pulse = 1 + 0.08 * math.sin(clamp((t - 3.0) / 0.35) * math.pi)
             put(c, glow_sprite(320, RED, 70), cx, 1000, "mm", alpha=p)
-            txt(c, str(int(round(525 * p))), cx, 1000, "black", 300, RED, "mm", 1, pulse)
+            label = "100s" if p >= 0.999 else str(int(round(100 * p)))
+            txt(c, label, cx, 1000, "black", 280, RED, "mm", 1, pulse)
         a3 = ap(t, 3.2)
-        txt(c, "known CVEs · one scan", cx, 1190 + (1 - a3) * 20, "semi", 50, PEACH, "mt", a3)
+        txt(c, "of known CVEs can hide", cx, 1170 + (1 - a3) * 20, "semi", 50, PEACH, "mt", a3)
+        txt(c, "in outdated apps", cx, 1236 + (1 - a3) * 20, "semi", 50, PEACH, "mt", a3)
 
     scenes.append(Scene(4.8, hook, [(1.3, "riser"), (3.0, "pop")], "hook"))
 
@@ -937,8 +941,9 @@ def short_scenes(W=1080, H=1920):
         if e > 0:
             x, y, w, h = 90, 1180, W - 180, 300
             card(c, x, y, w, h, 28, (32, 26, 40), RED, clamp(e))
-            txt(c, "525 CVEs", cx, y + 40, "black", 110, RED, "mt", clamp(e))
-            rich(c, [("→  ", OVER0, "bold"), ("14 actions", GREEN, "black")], cx, y + 180, 72,
+            txt(c, "ON THIS PC", cx, y + 26, "semi", 28, OVER0, "mt", clamp(e))
+            txt(c, "525 CVEs", cx, y + 66, "black", 100, RED, "mt", clamp(e))
+            rich(c, [("→  ", OVER0, "bold"), ("14 actions", GREEN, "black")], cx, y + 196, 66,
                  "mt", clamp(e))
 
     scenes.append(Scene(sc.duration, scan, [(x, "click") for x in sc.clicks()] + [(t_done + 0.2, "pop")],
@@ -1171,8 +1176,8 @@ def write_wav(path, scenes, total):
 # automatically when its narration needs more time.
 VO = {
     "youtube": {
-        "hook": [(0.3, "How many known security vulnerabilities are sitting on an ordinary Windows PC?"),
-                 (3.2, "On this one: five hundred and twenty-five.")],
+        "hook": [(0.3, "Every outdated app on your PC carries known security vulnerabilities."),
+                 (3.0, "Across a whole machine, that can easily add up to hundreds.")],
         "problem": [(0.3, "Chrome, AnyDesk, OneDrive, Adobe Reader. Every app stuck on an old version "
                           "carries vulnerabilities the whole world already knows about."),
                     (0.0, "Tracking all of them by hand? Nobody wants that.")],
@@ -1186,8 +1191,8 @@ VO = {
                 (0.0, "Finally, it explains the risk in plain language, and hands you the fix.")],
         "scan": [(0.4, "All it takes is one command."),
                  (3.4, "A hundred and forty-three programs scanned. Twenty-one matched."),
-                 (6.8, "The result: five hundred and twenty-five vulnerabilities, boiled down to "
-                       "just fourteen clear actions, most critical first.")],
+                 (6.8, "On this machine, that meant five hundred and twenty-five known "
+                       "vulnerabilities, boiled down to just fourteen clear actions, most critical first.")],
         "plain": [(0.3, "The raw database entry is technical and long."),
                   (0.0, "Mister Ducksafe tells you what it actually means: the application can be "
                         "hijacked through a memory error."),
@@ -1206,10 +1211,10 @@ VO = {
     },
     "short": {
         "hook": [(0.2, "How many security holes are on your PC?"),
-                 (0.2, "On this one? Five hundred and twenty-five.")],
+                 (0.2, "It can easily be hundreds.")],
         "scan": [(0.3, "One command: Mister Ducksafe scan."),
                  (2.6, "A hundred and forty-three programs scanned."),
-                 (0.3, "Five hundred and twenty-five vulnerabilities. But only fourteen actions.")],
+                 (0.3, "On this PC: five hundred and twenty-five vulnerabilities. But only fourteen actions.")],
         "plain": [(0.2, "No jargon. It tells you the risk in plain words, and gives you the fix.")],
         "features": [(0.3, "A single exe, official N V D data, CI support, and one hundred percent local.")],
         "cta": [(0.3, "Free and open source. Link in the description.")],

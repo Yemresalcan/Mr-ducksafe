@@ -1,7 +1,7 @@
 # YouTube upload text
 
-Videos: [`mr-ducksafe-youtube.mp4`](mr-ducksafe-youtube.mp4) (1920×1080, 1:58) ·
-[`mr-ducksafe-short.mp4`](mr-ducksafe-short.mp4) (1080×1920, 0:37) ·
+Videos: [`mr-ducksafe-youtube.mp4`](mr-ducksafe-youtube.mp4) (1920×1080, 1:59) ·
+[`mr-ducksafe-short.mp4`](mr-ducksafe-short.mp4) (1080×1920, 0:36) ·
 Thumbnail: [`thumbnail.png`](thumbnail.png) (1280×720)
 
 After uploading, replace the `docs/media/*.mp4` links in the "Promo Video /
@@ -43,13 +43,13 @@ Chrome, Adobe Reader, Office, AnyDesk, Node.js… old versions of everyday apps 
 0:00 Intro
 0:08 The problem: outdated software
 0:21 What is mr-ducksafe?
-0:31 How it works
+0:32 How it works
 0:51 Demo: mr-ducksafe scan
-1:07 Plain-language risk + fix
-1:19 Demo: --app and --details
-1:27 CI/CD: --fail-on and JSON
-1:38 History and privacy
-1:49 Install and links
+1:08 Plain-language risk + fix
+1:20 Demo: --app and --details
+1:28 CI/CD: --fail-on and JSON
+1:39 History and privacy
+1:50 Install and links
 
 📦 Install
 • GitHub Releases → mr-ducksafe.exe

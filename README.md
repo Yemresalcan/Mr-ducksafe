@@ -29,8 +29,8 @@ Not 500+ CVEs → ~10 action items. Risk in plain language, fix in one command.
 <!-- After uploading to YouTube, replace the links below with the video URLs. -->
 <a href="docs/media/mr-ducksafe-youtube.mp4"><img src="docs/media/thumbnail.png" alt="mr-ducksafe promo video — hundreds of CVEs → a few actions" width="720"></a>
 
-- ▶️ **YouTube (1:58):** [docs/media/mr-ducksafe-youtube.mp4](docs/media/mr-ducksafe-youtube.mp4) — the problem, how it works, live demo, CI usage, privacy
-- 📱 **Shorts (0:37, vertical):** [docs/media/mr-ducksafe-short.mp4](docs/media/mr-ducksafe-short.mp4)
+- ▶️ **YouTube (1:59):** [docs/media/mr-ducksafe-youtube.mp4](docs/media/mr-ducksafe-youtube.mp4) — the problem, how it works, live demo, CI usage, privacy
+- 📱 **Shorts (0:36, vertical):** [docs/media/mr-ducksafe-short.mp4](docs/media/mr-ducksafe-short.mp4)
 
 Both videos are narrated in English. They and the thumbnail are generated in code from the scan output in `scripts/demo/` — see [Regenerating the promo material](#regenerating-the-promo-material).
 
